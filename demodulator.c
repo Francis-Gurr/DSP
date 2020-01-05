@@ -1,17 +1,17 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
+#include<string.h>
+
+#define PI 3.14160
 
 int main(int argc, char *argv[]){
 
 	FILE *fin_diff, *fin_sum, *fout_diff, *fout_sum;
 	int n;
-	float fs_in = 10;
-	float[] f = {1.05, 1}, 
-		in = new float[2],
-		out = new float[2],
-		loc_osc = new float[2], 
-		fcalc = new float[2];
+	double fs_in = 10;
+	double f[] = {1.05, 1}; 
+	double in[2], out[2], loc_osc[2], fcalc[2];
 
 	// check if we have 6 arguments as required
 	if(argc!=6){
@@ -53,7 +53,8 @@ int main(int argc, char *argv[]){
 	printf("SUM output file: %s\n", argv[4]);
 
 	// assign n to be the current value so we can create the local oscillator
-	if(argv[5] == "0") {
+	printf("n is %s\n", argv[5]);
+	if(strcmp(argv[5], "0") == 0) {
 		n=0;
 	}
 	else {
@@ -72,7 +73,7 @@ int main(int argc, char *argv[]){
 		// create a local oscillator and multiply the input by it
 		for(int i=0; i<2; i++) {
 			fcalc[i] = 2 * PI * (f[i]/fs_in) * n;
-			loc_osc[i] = cosf(fcalc[i]);
+			loc_osc[i] = cos(fcalc[i]);
 			out[i] = loc_osc[i] * in[i];
 		}
 
@@ -89,5 +90,5 @@ int main(int argc, char *argv[]){
 	fclose(fout_diff);
 	fclose(fout_sum);
 
-	exit(0)
+	exit(0);
 }
