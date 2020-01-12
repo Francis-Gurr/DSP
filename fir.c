@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "fir.h"
 
+
 float fir_filter(float *b, circ_buffer_t *x) {
     float y = 0;
     for (size_t i = 0; i < ELEMOF(x->samples); i++) {
