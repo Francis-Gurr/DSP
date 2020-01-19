@@ -9,42 +9,13 @@
 
 
 // Data for FDM demultiplexing using bandpass filters
-static fir_buffer_t fdm_filter_buffer;
+static struct fir_buffer fdm_filter_buffer;
 static float sum_fdm_filter_weights[FIR_FILTER_LEN] = {
     // Insert filter weights for the band pass FIR filter here
 };
 static float diff_fdm_filter_weights[FIR_FILTER_LEN] = {
     // Insert filter weights for the band pass FIR filter here
 };
-
-
-// Data for DSB-SC demodulating using Costas loop detector
-static fir_buffer_complex_t sum_dsbsc_lp_filter_buffer;
-static float sum_dsbsc_lp_filter_weights[FIR_FILTER_LEN] = {
-    // Insert filter weights for the low pass FIR filter here
-};
-static fir_buffer_t sum_dsbsc_loop_filter_buffer;
-static float sum_dsbsc_loop_filter_weights[FIR_FILTER_LEN] = {
-    // Insert filter weights for the Costas loop filter here
-};
-
-static fir_buffer_complex_t diff_dsbsc_lp_filter_buffer;
-static float diff_dsbsc_lp_filter_weights[FIR_FILTER_LEN] = {
-    // Insert filter weights for the low pass FIR filter here
-};
-static fir_buffer_t diff_dsbsc_loop_filter_buffer;
-static float diff_dsbsc_loop_filter_weights[FIR_FILTER_LEN] = {
-    // Insert filter weights for the Costas loop filter here
-};
-
-
-// Data for resampling using interpolation by 3 then decimation by 625
-static fir_buffer_complex_t resampling_filter_buffer;
-static float resampling_filter_weights[FIR_FILTER_LEN] = {
-    // Insert filter weights for the convolved reconstruction and anti-aliasing
-    // filters here
-};
-
 
 // Main entry point for program
 void main(int argc, char *argv[]) {
