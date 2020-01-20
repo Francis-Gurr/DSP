@@ -1,3 +1,10 @@
+struct Buffer {
+  const int SIZE;
+  float values[SIZE];
+  int offset;
+  int wait;
+} res_buffer, dec_buffer;
+
 void main(pipe, const int MAX_INPUTS) {
   /* Filter declarations */
   const int FILTER_SIZE = 15
@@ -13,49 +20,48 @@ void main(pipe, const int MAX_INPUTS) {
                                   0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
                                   0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
   int curr_dec_filter = 0;
-  const int dec_m = 5; /* Decimation factor */
 
-  /* Buffer declarations */
-  float buffer[FILTER_SIZE] = {0};
-  int *p_offset = 0; /* Pointer containing the buffer offset value */
-  int *p_buffer_wait = 0; /* Pointer containing the number of input samples required before continuing */
+  /* Resample buffer declarations */
+  struct Buffer *buff_res = {.SIZE=FILTER_SIZE, .values[FILTER_SIZE]={0}, .offset=0, .wait=1};
+  /* Decimate buffer declarations */
+  struct Buffer *buff_dec = {.SIZE=FILTER_SIZE, .values[FILTER_SIZE]={0}, .offset=0, .wait=1};
 
   /* Other declarations */
   float *p_in; /* Pointer to the input sample */
+  float *p_intermdiate;
   float *p_out; /* Pointer to the output sample */
 
   /* For each sample, resample it */
   int count;
-  for (count = MAX_INPUTS, count > 0, count--) {
+  for (count = MAX_INPUTS; count > 0; count--) {
     /* Get next input sample */
     *p_in = pipe.next();
 
     /* Add the input sample to the buffer */
-    buffer[*p_offset] = *p_in;
-    /* Increase the offset and wrap if necessary */
-    if (++ *p_offset > FILTER_SIZE) {
-      *p_offset = 0;
-    }
-    /* Decrease the buffer wait value */
-    *p_buffer_wait --;
+    add_to_buffer(*p_intermdiate, *buff_res)
 
     /* If the buffer is ready, resample */
-    if (*p_buffer_wait == 0) {
-      /* Resample by a factor of 3/5 */
-      resample(*p_in, FILTER_SIZE, p_H[curr_res_filter], buffer, *p_offset, *p_out);
+    if (buff_res->wait == 0) {
+      /* Resample by a factor of 3/25 */
+      fir(*p_in, p_H[curr_res_filter], buff_res, *p_intermediate);
       /* Increase the curr_filter and buffer wait values */
-      if (++*curr_filter > 2) {
+      if (++*curr_res_filter > 2) {
         curr_res_filter = 0;
       }
-      if (curr_res_filter == 2) {
-        *p_buffer_wait = 1;
+      if (*curr_res_filter == 2) {
+        buff_res->wait = 9;
       }
       else {
-        *p_buffer_wait = 2;
+        buff_res->wait = 8;
       }
 
-      /* Decimate 5 times by 5 */
-      decimate(*p_out, )
+      /* Decimate by 25 */
+      add_to_buffer(*p_intermdiate, *buff_dec);
+      if (buff_dec->wait == 0) {
+        fir(*p_intermdiate, h_dec, buff_dec, *p_out);
+        buff_dec->wait = 25;
+      }
+
     }
 
     /* Send output in the pipe */
@@ -63,14 +69,24 @@ void main(pipe, const int MAX_INPUTS) {
   }
 }
 
-void resample(float *p_in, const int FILTER_SIZE, const double h, float buffer, int *p_offset, float *p_out) {
-  float sum = 0.0;
+void add_to_buffer(float *p_elem, Buffer *buff) {
+  /* Add the input sample to the buffer */
+  buff->values[buff->offset] = *p_elem;
+  /* Increase the offset and wrap if necessary */
+  if (++buff->offset > buff->SIZE) {
+    buff->offset = 0;
+  }
+  /* Decrease the buffer wait value */
+  buff->wait--;
+}
+
+void fir(float *p_in, const double h, Buffer buff, float *p_sum) {
+  *sum = 0.0;
   int i;
-  for (i = *p_offset; i > 0; i--) {
-    sum += buffer[i] * h++;
+  for (i = buff->offset; i > 0; i--) {
+    *sum += buff->values[i] * h++;
   }
-  for (i = FILTER_SIZE; i > *p_offset; i--) {
-    sum += buffer[i] * h++;
+  for (i = buff->SIZE; i > buff->offset; i--) {
+    *sum += buff->values[i] * h++;
   }
-  *p_out = sum
 }
