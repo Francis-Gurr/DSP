@@ -7,14 +7,14 @@ struct Buffer {
 
 void main(pipe, const int MAX_INPUTS) {
   /* Filter declarations */
-  const int FILTER_SIZE = 15
-  const double h0[FILTER_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  const double h1[FILTER_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  const double h3[FILTER_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  double *const p_H[h0, h1, h3]; /* Array of pointers to each filter */
+  const int FILTER_RES_SIZE = 15
+  const float h0[FILTER_RES_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+  const float h1[FILTER_RES_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+  const float h3[FILTER_RES_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+  float *const p_H[h0, h1, h3]; /* Array of pointers to each filter */
   int curr_res_filter = 0; /* Index of the current filter in p_H*/
   /* Decimation filter declarations */
-  const double h0[FILTER_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
+  const float h0[FILTER_DEC_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
                                   0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
                                   0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
                                   0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
@@ -22,9 +22,9 @@ void main(pipe, const int MAX_INPUTS) {
   int curr_dec_filter = 0;
 
   /* Resample buffer declarations */
-  struct Buffer *buff_res = {.SIZE=FILTER_SIZE, .values[FILTER_SIZE]={0}, .offset=0, .wait=1};
+  struct Buffer *buff_res = {.SIZE=FILTER_RES_SIZE, .values[FILTER_RES_SIZE]={0}, .offset=0, .wait=1};
   /* Decimate buffer declarations */
-  struct Buffer *buff_dec = {.SIZE=FILTER_SIZE, .values[FILTER_SIZE]={0}, .offset=0, .wait=1};
+  struct Buffer *buff_dec = {.SIZE=FILTER_DEC_SIZE, .values[FILTER_SIZE]={0}, .offset=0, .wait=1};
 
   /* Other declarations */
   float *p_in; /* Pointer to the input sample */
@@ -38,7 +38,7 @@ void main(pipe, const int MAX_INPUTS) {
     *p_in = pipe.next();
 
     /* Add the input sample to the buffer */
-    add_to_buffer(*p_intermdiate, *buff_res)
+    add_to_buffer(*p_in, *buff_res)
 
     /* If the buffer is ready, resample */
     if (buff_res->wait == 0) {
