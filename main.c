@@ -5,27 +5,70 @@
 #include "get_lr.h"
 #include "write.h"
 
+struct Buffer {
+    const int SIZE;
+    float values[SIZE];
+    int offset;
+    int wait;
+};
+
+struct Filter_Res {
+    const int SIZE; // Filter size
+    float *const p_H[3]; // Array of pointers to each filter
+    int curr_filter;
+};
+
+struct Filter_Dec {
+    const int SIZE; // Filter size
+    const float H[SIZE]; // Filter coefficients
+};
+
 int main(int argc, char *argv[]) {
-    const *char input_file = *arg[0];
-    const *char left_file = *arg[1];
-    const *char right_file = *arg[2];
-    
-    static float sum_filter_weights[FIR_FILTER_LEN] = {
-    // Insert filter weights for the band pass FIR filter here
+  /****************************************************************************
+  * START OF DECLARATIONS
+  *****************************************************************************/
+
+    /* FILE PATHS */
+    const *char FILE_IN = *arg[0];
+    const *char FILE_LEFT = *arg[1];
+    const *char FILE_RIGHT = *arg[2];
+
+    /* FIR FILTER */
+    const int F;
+    const float H_SUM[FIR_FILTER_LEN] = {}; // Sum filter coefficients
+    const float H_DIFF[FIR_FILTER_LEN] = {}; // Diff filter coefficients
+
+    /* DEMODULATION */
+    const float SUM_OSC[5] = {};
+    const float DIFF_OSC[100] = {};
+
+    /* RESAMPLE */
+    const int SIZE_RES = 0;
+    const float H0[SIZE_RES] = {};
+    const float H1[SIZE_RES] = {};
+    const float H2[SIZE_RES] = {};
+    struct Filter_Res *p_filter_res = {
+        .SIZE = SIZE_RES,
+        .p_H = {H0,H1,H2},
+        .curr_filter = 0
     };
-    static float diff_filter_weights[FIR_FILTER_LEN] = {
-    // Insert filter weights for the band pass FIR filter here
+    const in SIZE_DEC;
+    const float H0[SIZE_DEC] = {};
+    struct Filter_Dec *p_filter_dec = {
+        .SIZE = SIZE_DEC,
+        .H = {}
     };
-    static const float sum_osc[5] = {
-    };
-    static const float diff_osc[100] = {
-    };
-    
-    // Copy Francis' stuff
-    
+    struct Buffer *buff_res = {.SIZE=SIZE_RES, .values[SIZE_RES]={0}, .offset=0, .wait=1}; // Resample buffer
+    struct Buffer *buff_dec = {.SIZE=SIZE_DEC, .values[SIZE_DEC]={0}, .offset=0, .wait=1}; // Decimation buffer
+
+
+    /****************************************************************************
+    * END OF DECLARATIONS
+    *****************************************************************************/
+
     int *p_exit = 0;
     const int size = 2000
-    float buffer[size] = {0.0}; 
+    float buffer[size] = {0.0};
     while (*p_exit == 0) {
         buffer = read(input_file,*p_exit,size);
         sum = fir(buffer,sum_filter_weights);
@@ -40,7 +83,7 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
-        
+
 // OLD
 
 // Macros for program arguments
