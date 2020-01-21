@@ -1,6 +1,47 @@
-#include <stdio.h>
+#include "read.h"
 #include "fir.h"
+#include "demod.h"
+#include "resample.h"
+#include "get_lr.h"
+#include "write.h"
 
+int main(int argc, char *argv[]) {
+    const *char input_file = *arg[0];
+    const *char left_file = *arg[1];
+    const *char right_file = *arg[2];
+    
+    static float sum_filter_weights[FIR_FILTER_LEN] = {
+    // Insert filter weights for the band pass FIR filter here
+    };
+    static float diff_filter_weights[FIR_FILTER_LEN] = {
+    // Insert filter weights for the band pass FIR filter here
+    };
+    static const float sum_osc[5] = {
+    };
+    static const float diff_osc[100] = {
+    };
+    
+    // Copy Francis' stuff
+    
+    int *p_exit = 0;
+    const int size = 2000
+    float buffer[size] = {0.0}; 
+    while (*p_exit == 0) {
+        buffer = read(input_file,*p_exit,size);
+        sum = fir(buffer,sum_filter_weights);
+        diff = fir(buffer,diff_filter_weights);
+        sum_demod = demod(sum,sum_osc);
+        diff_demod = demod(diff,diff_osc);
+        sum_res = resample(sum_demod);
+        diff_res = resample(diff_demod);
+        [l,r] = get_lr(sum_res,diff_res);
+        write(l,left_file);
+        write(r,right_file);
+    }
+    return 0;
+}
+        
+// OLD
 
 // Macros for program arguments
 #define INPUT_FILE (argv[0])
@@ -28,7 +69,7 @@ void main(int argc, char *argv[]) {
     while (!feof(input_f)) {
         // Populate FDM FIR filter buffer from input file
         float *p_input = fir_buffer_next(&fdm_filter_buffer);
-        fread((void *) p_input, sizeof(*p_input), input_fp);
+        fread((void *) p_input, sizeof(*p_input), input_fp)
 
         // Perform FDM de-multiplexing to obtain amplitude modulated signals for
         // each channel
