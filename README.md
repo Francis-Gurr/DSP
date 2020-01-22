@@ -1,7 +1,4 @@
-# DSP
-DSP Coursework
-
-# Coursework instructions
+# DSP Coursework Instructions
 
 ![pg1](https://github.com/Francis-Gurr/DSP/blob/master/other/0001.jpg)
 
