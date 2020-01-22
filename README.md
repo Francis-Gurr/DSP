@@ -1,20 +1,10 @@
 # DSP
 DSP Coursework
 
-## Tasks now
-FIR - Lauren
+# Coursework instructions
 
-DEMOD - Vicky
+![pg1](https://github.com/Francis-Gurr/DSP/blob/master/other/0001.jpg)
 
-RESAMPLING - Francis
+![pg2](https://github.com/Francis-Gurr/DSP/blob/master/other/0002.jpg)
 
-Deadline - 1st January
-
-## Later
-SUM
-
-DIFF
-
-NORMALISE
-
-OPTIMISATION
+![pg3](https://github.com/Francis-Gurr/DSP/blob/master/other/0003.jpg)
