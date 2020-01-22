@@ -1,9 +1,9 @@
 # DSP Coursework 
 
-###Report
+##Report
 Link to latex overleaf: [HERE](https://i.pinimg.com/originals/11/63/1f/11631f4663083360fe1b02269fb257c4.png)
 
-###Instructions
+##Instructions
 
 ![pg1](https://github.com/Francis-Gurr/DSP/blob/master/other/0001.jpg)
 
