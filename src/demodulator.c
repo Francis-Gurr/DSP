@@ -1,94 +1,60 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
-#include<string.h>
+void main(pipe, int branch){
 
-#define PI 3.14160
+	/* Pre-calculated values for cos functions */
+	const float sum_osc[sum_size] = {1,0.809016994374947,0.309016994374947,-0.309016994374947,-0.809016994374947};
+	const float diff_osc[diff_size] = {1,0.79015501237569,0.248689887164855,-0.397147890634781,-0.876306680043864,-0.987688340595138,-0.684547105928689,-0.094108313318514,0.535826794978997,
+				     0.940880768954225,0.951056516295154,0.56208337785213,-0.062790519529314,-0.661311865323653,-0.982287250728689,-0.891006524188368,-0.425779291565072,
+				     0.218143241396543,0.770513242775789,0.999506560365731,0.809016994374948,0.278991106039228,-0.368124552684679,-0.860742027003944,-0.992114701314478,
+				     -0.707106781186547,-0.125333233564302,0.509041415750371,0.929776485888252,0.960293685676943,0.587785252292472,-0.031410759078127,-0.63742398974869,
+				     -0.975916761938748,-0.90482705246602,-0.453990499739545,0.187381314585724,0.750111069630461,0.998026728428271,0.827080574274561,0.309016994374948,
+				     -0.338737920245292,-0.844327925502016,-0.99556196460308,-0.72896862742141,-0.156434465040231,0.481753674101716,0.917754625683981,0.968583161128631,
+				     0.612907053652974,-4.9047770029553E-16,-0.612907053652975,-0.968583161128632,-0.91775462568398,-0.481753674101716,0.156434465040229,0.728968627421413,
+				     0.99556196460308,0.844327925502016,0.338737920245288,-0.309016994374949,-0.827080574274562,-0.998026728428272,-0.750111069630457,-0.187381314585723,
+				     0.453990499739546,0.904827052466021,0.975916761938747,0.637423989748689,0.03141075907813,-0.587785252292476,-0.960293685676943,-0.929776485888251,
+				     -0.509041415750367,0.125333233564307,0.707106781186548,0.992114701314478,0.860742027003942,0.368124552684676,-0.278991106039229,-0.809016994374946,
+				     -0.999506560365731,-0.770513242775789,-0.218143241396543,0.425779291565076,0.891006524188369,0.982287250728689,0.661311865323653,0.06279051952931,
+				     -0.562083377852132,-0.951056516295153,-0.940880768954224,-0.535826794978994,0.094108313318515,0.684547105928688,0.987688340595138,0.876306680043863,
+				     0.397147890634781,-0.24868988716486,-0.790155012375688};
+	/* Size of arrays of pre-calculated values */
+	const int[2] size = {5,100};
 
-int main(int argc, char *argv[]){
+	/* List of pointers for cos values */
+	float *const p_osc_list[sum_osc, diff_osc];
 
-	FILE *fin_diff, *fin_sum, *fout_diff, *fout_sum;
-	int n;
-	double fs_in = 10;
-	double f[] = {1.05, 1}; 
-	double in[2], out[2], loc_osc[2], fcalc[2];
+	/* cos values represent half the waveform so inverse values are needed half the time */
+	bool inv = false;
+	bool exitflag = false;
 
-	// check if we have 6 arguments as required
-	if(argc!=6){
-		printf("ERROR: wrong number of parameters\n");
-		printf("USE: %s diff_in_file sum_in_file diff_out_file sum_out_file n\n",argv[0]);
-		exit(1);
-	}
+	/* Pointers for input and output values */
+	float *p_in;
+	float *p_out;
 
-	// open input diff file ==> TEMPORARY TESTING
-	fin_diff=fopen(argv[1],"rb");
-	if(fin_diff == NULL) {
-		printf("ERROR: %s does not exist\n", argv[1]);
-		exit(1);
-	}
-	printf("DIFF input file: %s \n", argv[1]);
+	/* Choose whether to point to sum or diff cos values */
+	float *const p_osc = p_osc_list[branch];
 
-	// open input sum file ==> TEMPORARY TESTING
-	fin_sum=fopen(argv[2],"rb");
-	if(fin_sum == NULL) {
-		printf("ERROR: %s does not exist\n", argv[2]);
-		exit(1);
-	}
-	printf("SUM input file: %s\n", argv[2]);
+	/* Continue until exit signal sent */
+	while(!exitflag) {
+		/* Get next input sample */
+		*p_in, exitflag = pipe.next();
 
-	// open output diff file ==> TEMPORARY TESTING
-	fout_diff=fopen(argv[3], "w+b");
-	if(fout_diff == NULL) {
-		printf("ERROR: %s cannot be created\n", argv[3]);
-		exit(1);
-	}
-	printf("DIFF output file: %s\n", argv[3]);
+		/* Coherent demodulation: multiply signal by generated oscillator value */
+		if (inv) {
+			*p_out = -1 * (*p_in * *p_osc);
+		}
+		else {
+			*p_out = *p_in * *p_osc;
+		}
 
-	// open output sum file ==> TEMPORARY TESTING
-	fout_sum=fopen(argv[4], "w+b");
-	if(fout_sum == NULL) {
-		printf("ERROR: %s cannot be created\n", argv[4]);
-		exit(1);
-	}
-	printf("SUM output file: %s\n", argv[4]);
-
-	// assign n to be the current value so we can create the local oscillator
-	printf("n is %s\n", argv[5]);
-	if(strcmp(argv[5], "0") == 0) {
-		n=0;
-	}
-	else {
-		n=atoi(argv[5]);
-		if (n == 0) {
-			printf("ERROR: n must be an integer value\n");
-			exit(1);
+		/* Move pointer to next oscillator value */
+		if (p_osc < p_osc_list[branch] + size[branch]) {
+			p_osc++;
+		}
+		/* Wrap around and flip the cos values */
+		else {
+			p_osc = p_osc_list[branch];
+			inv = !inv;
 		}
 	}
 
-	printf("processing ...\n");
-
-	// keep reading a float from each file until the end
-	while(fread(&in[0], sizeof(float), 1, fin_diff) && fread(&in[1], sizeof(float), 1, fin_sum)) {
-		n++;
-		// create a local oscillator and multiply the input by it
-		for(int i=0; i<2; i++) {
-			fcalc[i] = 2 * PI * (f[i]/fs_in) * n;
-			loc_osc[i] = cos(fcalc[i]);
-			out[i] = loc_osc[i] * in[i];
-		}
-
-		// write output to file
-		fwrite(&out[0], sizeof(float), 1, fout_diff);
-		fwrite(&out[1], sizeof(float), 1, fout_sum);
-	}
-
-	printf("done\n");
-
-	// close the files
-	fclose(fin_diff);
-	fclose(fin_sum);
-	fclose(fout_diff);
-	fclose(fout_sum);
-
-	exit(0);
 }
+
