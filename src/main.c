@@ -67,7 +67,8 @@ int main(int argc, char *argv[]) {
     *****************************************************************************/
 
     int *p_exit = 0;
-    const int size = 2000
+    const int SIZE_IN = 1875;
+    const int SIZE_OUT = 9;
     float buffer[size] = {0.0};
     while (*p_exit == 0) {
         buffer = read(input_file,*p_exit,size);
@@ -75,8 +76,10 @@ int main(int argc, char *argv[]) {
         diff = fir(buffer,diff_filter_weights);
         sum_demod = demod(sum,sum_osc);
         diff_demod = demod(diff,diff_osc);
-        sum_res = resample(sum_demod);
-        diff_res = resample(diff_demod);
+        sum_res = resample(sum_demod, *p_filter_res, *p_filter_dec, *buff_res, *buff_dec);
+	reset_buffer(buff_res);
+	reset_buffer(buff_dec);
+        diff_res = resample(diff_demod, *p_filter_res, *p_filter_dec, *buff_res, *buff_dec);
         [l,r] = get_lr(sum_res,diff_res);
         write(l,left_file);
         write(r,right_file);
