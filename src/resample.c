@@ -1,72 +1,48 @@
-struct Buffer {
-  const int SIZE;
-  float values[SIZE];
-  int offset;
-  int wait;
-} res_buffer, dec_buffer;
+int,float resample(float *p_batch, int batch_size, int batch_size_res, struct Filter *p_filter, struct Buffer *p_buff_res, struct Buffer *p_buff_dec) {
+	int batch_size_res = batch_size * 0.0048;
+	float resampled[batch_size_res];
+	float *p_resampled = resampled;
+	// For each sample in the batch
+	for (int i = batch_size; i--; ) {
+		float sample = *p_batch++; // Sample is the current value from the array
+		float *const p_H[3] = p_filter->p_H;
+		int curr_res_filter = p_filter->curr_res_filter;
+		int curr_dec_filter = p_filter->curr_dec_filter;
 
-void main(pipe, const int MAX_INPUTS) {
-  /* Filter declarations */
-  const int FILTER_RES_SIZE = 15
-  const float h0[FILTER_RES_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  const float h1[FILTER_RES_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  const float h3[FILTER_RES_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  float *const p_H[h0, h1, h3]; /* Array of pointers to each filter */
-  int curr_res_filter = 0; /* Index of the current filter in p_H*/
-  /* Decimation filter declarations */
-  const float h0[FILTER_DEC_SIZE] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
-                                  0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
-                                  0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
-                                  0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
-                                  0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  int curr_dec_filter = 0;
-
-  /* Resample buffer declarations */
-  struct Buffer *buff_res = {.SIZE=FILTER_RES_SIZE, .values[FILTER_RES_SIZE]={0}, .offset=0, .wait=1};
-  /* Decimate buffer declarations */
-  struct Buffer *buff_dec = {.SIZE=FILTER_DEC_SIZE, .values[FILTER_SIZE]={0}, .offset=0, .wait=1};
-
-  /* Other declarations */
-  float *p_in; /* Pointer to the input sample */
-  float *p_intermdiate;
-  float *p_out; /* Pointer to the output sample */
-
-  /* For each sample, resample it */
-  int count;
-  for (count = MAX_INPUTS; count > 0; count--) {
-    /* Get next input sample */
-    *p_in = pipe.next();
-
-    /* Add the input sample to the buffer */
-    add_to_buffer(*p_in, *buff_res)
-
-    /* If the buffer is ready, resample */
-    if (buff_res->wait == 0) {
-      /* Resample by a factor of 3/25 */
-      fir(*p_in, p_H[curr_res_filter], buff_res, *p_intermediate);
-      /* Increase the curr_filter and buffer wait values */
-      if (++*curr_res_filter > 2) {
-        curr_res_filter = 0;
-      }
-      if (*curr_res_filter == 2) {
-        buff_res->wait = 9;
-      }
-      else {
-        buff_res->wait = 8;
-      }
-
-      /* Decimate by 25 */
-      add_to_buffer(*p_intermdiate, *buff_dec);
-      if (buff_dec->wait == 0) {
-        fir(*p_intermdiate, h_dec, buff_dec, *p_out);
-        buff_dec->wait = 25;
-      }
-
-    }
-
-    /* Send output in the pipe */
-    pipe.send(*p_out)
-  }
+		// Add the sample to the resampling buffer
+		add_to_buffer(sample, *p_buff_res);
+		
+		// If the buffer is ready, resample
+		if (buff_res->wait == 0) {
+			// First resample by a factor of 3/25
+			fir(p_filter->p_H[curr_res_filter], p_buff_res, resampled);
+			
+			// Increase the curr_filter and buffer wait values
+			if (++curr_res_filter > 2) {
+				curr_res_filter = 0;
+			}
+			if (curr_res_filter == 2) {
+				buff_res->wait = 9;
+			}
+			else {
+				buff_res->wait = 8;
+			}
+			
+			// Add the resampled sample to the decimation buffer
+			add_to_buffer(resampled, p_buff_dec);
+			
+			// If the decimation buffer is ready, decimate
+			if (buff_dec->wait == 0) {
+				fir(resampled, p_H[curr_dec_filter], p_buff_dec, resampled);
+				buff_dec->wait = 25;
+				if (++curr_dec_filter > 2) {
+					curr_dec_filter = 0;
+				}
+			}
+		}
+	}
+	resampled++;
+	return [p_resampled, batch_size_res]
 }
 
 void add_to_buffer(float *p_elem, Buffer *buff) {
@@ -80,13 +56,13 @@ void add_to_buffer(float *p_elem, Buffer *buff) {
   buff->wait--;
 }
 
-void fir(float *p_in, const double h, Buffer buff, float *p_sum) {
-  *sum = 0.0;
+void fir(const double h, Buffer buff, float *p_sum) {
+  *p_sum = 0.0;
   int i;
   for (i = buff->offset; i > 0; i--) {
-    *sum += buff->values[i] * h++;
+    *p_sum += buff->values[i] * h(+i);
   }
   for (i = buff->SIZE; i > buff->offset; i--) {
-    *sum += buff->values[i] * h++;
+    *p_sum += buff->values[i] * h(+i);
   }
 }

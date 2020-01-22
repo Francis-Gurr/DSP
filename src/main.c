@@ -12,15 +12,11 @@ struct Buffer {
     int wait;
 };
 
-struct Filter_Res {
+struct Filter {
     const int SIZE; // Filter size
     float *const p_H[3]; // Array of pointers to each filter
-    int curr_filter;
-};
-
-struct Filter_Dec {
-    const int SIZE; // Filter size
-    const float H[SIZE]; // Filter coefficients
+    int curr_res_filter;
+    int curr_dec_filter;
 };
 
 int main(int argc, char *argv[]) {
@@ -43,21 +39,17 @@ int main(int argc, char *argv[]) {
 	const float DIFF_OSC[100] = {};
 	
 	/* RESAMPLE */
-	const int SIZE_RES = 0;
-	const float H0[SIZE_RES] = {};
-	const float H1[SIZE_RES] = {};
-	const float H2[SIZE_RES] = {};
-	struct Filter_Res *p_filter_res = {
+	const int SIZE_RES = !;
+	const float H0[SIZE_RES] = {!};
+	const float H1[SIZE_RES] = {!};
+	const float H2[SIZE_RES] = {!};
+	struct Filter *p_filter = {
 		.SIZE = SIZE_RES,
 		.p_H = {H0,H1,H2},
-		.curr_filter = 0
+		.curr_res_filter = 0,
+		.curr_dec_filter = 0
 	};
-	const in SIZE_DEC;
-	const float H0[SIZE_DEC] = {};
-	struct Filter_Dec *p_filter_dec = {
-		.SIZE = SIZE_DEC,
-		.H = {}
-	};
+	const int SIZE_DEC = !;
 	struct Buffer *buff_res = {.SIZE=SIZE_RES, .values[SIZE_RES]={0}, .offset=0, .wait=1}; // Resample buffer
 	struct Buffer *buff_dec = {.SIZE=SIZE_DEC, .values[SIZE_DEC]={0}, .offset=0, .wait=1}; // Decimation buffer
 
@@ -93,8 +85,8 @@ int main(int argc, char *argv[]) {
 		// Resample sum and diff
 		float *p_sum_res;
 		float *p_dif_res;
-		sum_res = resample(sum_demod, *p_filter_res, *p_filter_dec, *buff_res, *buff_dec);
-		diff_res = resample(diff_demod, *p_filter_res, *p_filter_dec, *buff_res, *buff_dec);
+		p_sum_res = resample(p_sum_demod, *p_filter_res, *p_filter_dec, *buff_res, *buff_dec);
+		p_diff_res = resample(p_diff_demod, *p_filter_res, *p_filter_dec, *buff_res, *buff_dec);
 		// If last batch, update the batch_size_res
 		if (*p_exit != 0) {
 			batch_size_res = batch_size * RES_FACTOR;
