@@ -95,7 +95,8 @@ int main(int argc, char *argv[]) {
 		// Get left and right signals from sum and diff
 		float *p_left;
 		float *p_right;
-		[p_left, p_right] = get_lr(p_sum_res, p_diff_res);
+		p_left = get_l(p_sum_res, p_diff_res);
+		p_right = get_r(p_sum_res, p_diff_res);
 		
 		// Write left and right to file
 		write(p_left, FILE_LEFT);
