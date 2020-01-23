@@ -33,7 +33,7 @@ int,float resample(float *p_batch, int batch_size, int batch_size_res, struct Fi
 			
 			// If the decimation buffer is ready, decimate
 			if (buff_dec->wait == 0) {
-				fir(resampled, p_H[curr_dec_filter], p_buff_dec, resampled);
+				fir(resampled, p_filter->p_H[curr_dec_filter], p_buff_dec, resampled);
 				buff_dec->wait = 25;
 				if (++curr_dec_filter > 2) {
 					curr_dec_filter = 0;
@@ -56,13 +56,14 @@ void add_to_buffer(float *p_elem, Buffer *buff) {
   buff->wait--;
 }
 
-void fir(const double h, Buffer buff, float *p_sum) {
-  *p_sum = 0.0;
+void fir(const double h, Buffer buff, float *resampled) {
+  float sum = 0.0;
   int i;
   for (i = buff->offset; i > 0; i--) {
-    *p_sum += buff->values[i] * h(+i);
+    sum += buff->values[i] * h(+i);
   }
   for (i = buff->SIZE; i > buff->offset; i--) {
-    *p_sum += buff->values[i] * h(+i);
+    sum += buff->values[i] * h(+i);
   }
+  resampled = &sum
 }

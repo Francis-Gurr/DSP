@@ -1,9 +1,8 @@
-#include "read.h"
+#include "io.h"
 #include "fir.h"
 #include "demod.h"
 #include "resample.h"
 #include "get_lr.h"
-#include "write.h"
 
 struct Buffer {
     const int SIZE;
