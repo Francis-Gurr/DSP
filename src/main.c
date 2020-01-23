@@ -1,22 +1,14 @@
+#include "structs.h"
 #include "io.h"
 #include "fir.h"
-#include "demod.h"
+#include "demodulator.h"
 #include "resample.h"
-#include "get_lr.h"
 
-struct Buffer {
-    const int SIZE;
-    float values[SIZE];
-    int offset;
-    int wait;
-};
-
-struct Filter {
-    const int SIZE; // Filter size
-    float *const p_H[3]; // Array of pointers to each filter
-    int curr_res_filter;
-    int curr_dec_filter;
-};
+#define SIZE_FIR 5
+#define SIZE_RES 5
+#define SIZE_DEC 5
+#define SIZE_READ 1875
+#define SIZE_WRITE 9
 
 int main(int argc, char *argv[]) {
 	/****************************************************************************
@@ -24,49 +16,46 @@ int main(int argc, char *argv[]) {
 	 *****************************************************************************/
 	
 	/* FILE PATHS */
-	const char FILE_IN = *arg[0];
-	const char FILE_LEFT = *arg[1];
-	const char FILE_RIGHT = *arg[2];
+	const char FILE_IN = *argv[0];
+	const char FILE_LEFT = *argv[1];
+	const char FILE_RIGHT = *argv[2];
 	
 	/* FIR FILTER */
 	const int F;
-	const float H_SUM[FIR_FILTER_LEN] = {}; // Sum filter coefficients
-	const float H_DIFF[FIR_FILTER_LEN] = {}; // Diff filter coefficients
+	const float H_SUM[SIZE_FIR] = {}; // Sum filter coefficients
+	const float H_DIFF[SIZE_FIR] = {}; // Diff filter coefficients
 	
 	/* DEMODULATION */
 	const float SUM_OSC[5] = {};
 	const float DIFF_OSC[100] = {};
-	
+	struct Demod sum_osc = {.SIZE=5, .p_OSC=SUM_OSC, .index=0, .inverse=0};
+	struct Demod diff_osc = {.SIZE=100, .p_OSC=DIFF_OSC, .index=0, .inverse=0};	
+
 	/* RESAMPLE */
-	const int SIZE_RES = !;
-	const float H0[SIZE_RES] = {!};
-	const float H1[SIZE_RES] = {!};
-	const float H2[SIZE_RES] = {!};
-	struct Filter *p_filter = {
+	const float H0[SIZE_RES] = {0,1,2,3,4};
+	const float H1[SIZE_RES] = {0,1,2,3,4};
+	const float H2[SIZE_RES] = {0,1,2,3,4};
+	struct Filter filter = {
 		.SIZE = SIZE_RES,
 		.p_H = {H0,H1,H2},
 		.curr_res_filter = 0,
 		.curr_dec_filter = 0
 	};
-	const int SIZE_DEC = !;
-	struct Buffer *buff_res = {.SIZE=SIZE_RES, .values[SIZE_RES]={0}, .offset=0, .wait=1}; // Resample buffer
-	struct Buffer *buff_dec = {.SIZE=SIZE_DEC, .values[SIZE_DEC]={0}, .offset=0, .wait=1}; // Decimation buffer
+	struct Buffer buff_res = {.SIZE=SIZE_RES, .values={}, .offset=0, .wait=1}; // Resample buffer
+	struct Buffer buff_dec = {.SIZE=SIZE_DEC, .values={}, .offset=0, .wait=1}; // Decimation buffer
 
 	/****************************************************************************
 	* END OF DECLARATIONS
 	*****************************************************************************/
 
 	int *p_exit = 0;
-	const int SIZE_READ = 1875; // Max size of read batch
-	const int SIZE_WRITE = 9;
-	const float RES_FACTOR = 3/625;
 	int batch_size_res = 9; 
 	while (*p_exit == 0) {
 		// Read n=SIZE_READ samples from FILE_IN
 		// Return a pointer to the first element in the batch and the batch size
 		float *p_batch;
 		int batch_size;
-		[p_batch, batch_size] = read_batch(FILE_IN, SIZE_READ, *p_exit);
+		batch_size = read_batch(FILE_IN, SIZE_READ, p_batch, p_exit);
 		
 		// Use FIR filter to split the batch into sum and diff
 		// Return a pointer to the first element in the sum and diff array
@@ -78,14 +67,14 @@ int main(int argc, char *argv[]) {
 		// Demodulate sum and diff
 		float *p_sum_demod;
 		float *p_diff_demod;
-		p_sum_demod = demod(p_sum, batch_size, SUM_OSC);
-		p_diff_demod = demod(p_diff, batch_size, DIFF_OSC);
+		p_sum_demod = demod(p_sum, batch_size, &sum_osc);
+		p_diff_demod = demod(p_diff, batch_size, &diff_osc);
 		
 		// Resample sum and diff
 		float *p_sum_res;
 		float *p_dif_res;
-		[p_sum_res, batch_size_res] = resample(p_sum_demod, batch_size, p_filter, p_buff_res, p_buff_dec);
-		[p_diff_res, batch_size_res] = resample(p_diff_demod, batch_size, p_filter, p_buff_res, p_buff_dec);
+		p_sum_res = resample(p_sum_demod, &batch_size, &filter, &buff_res, &buff_dec);
+		p_diff_res = resample(p_diff_demod, &batch_size, &filter, &buff_res, &buff_dec);
 
 		// Get left and right signals from sum and diff
 		float *p_left;
@@ -94,12 +83,12 @@ int main(int argc, char *argv[]) {
 		p_right = get_r(p_sum_res, p_diff_res);
 		
 		// Write left and right to file
-		write(p_left, FILE_LEFT);
-		write(p_right, FILE_RIGHT);
+		write_batch(FILE_LEFT, SIZE_WRITE, p_left);
+		write_batch(FILE_RIGHT, SIZE_WRITE, p_right);
 	}
 	return 0;
 }
-
+/*
 // OLD
 
 // Macros for program arguments
@@ -137,4 +126,4 @@ void main(int argc, char *argv[]) {
         fir_filter(sum_fdm_filter_weights, &fdm_filter_buffer, &sum_am);
         fir_filter(diff_fdm_filter_weights, &fdm_filter_buffer, &diff_am);
     }
-}
+}*/

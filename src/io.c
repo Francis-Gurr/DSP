@@ -1,28 +1,25 @@
 #include<stdio.h>
 #include<fcntl.h>
 
-int[2] read_batch(FILE_ID, SIZE, *p_exit) {
+int read_batch(const char FILE_ID, const int SIZE, float *p_batch, int *p_exit) {
 	int fd, sz;
-	float[size] *buf_in;
 
 	fd = open(FILE_ID, 0_RDONLY);
-
-	sz = read(fd, buf_in, SIZE);
+	sz = read(fd, p_batch, SIZE);
 
 	if (sz != SIZE) {
 		*p_exit = 1;
 	}
 
 	close(fd);
-	return [buf_in, sz];
+	return sz;
 }
 
-int write_batch(FILE_ID, SIZE, buf_out) {
+int write_batch(const char FILE_ID, const int SIZE, float *p_batch) {
 	int fd, sz;
 
 	fd = open(FILE_ID, 0_WRONLY | 0_CREAT | 0_APPEND);
-
-	sz = write(fd, buf_out, SIZE);
+	sz = write(fd, p_batch, SIZE);
 	close(fd);
 
 	if (sz != SIZE) {

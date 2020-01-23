@@ -1,60 +1,43 @@
-void main(pipe, int branch){
+#include "structs.h"
 
-	/* Pre-calculated values for cos functions */
-	const float sum_osc[sum_size] = {1,0.809016994374947,0.309016994374947,-0.309016994374947,-0.809016994374947};
-	const float diff_osc[diff_size] = {1,0.79015501237569,0.248689887164855,-0.397147890634781,-0.876306680043864,-0.987688340595138,-0.684547105928689,-0.094108313318514,0.535826794978997,
-				     0.940880768954225,0.951056516295154,0.56208337785213,-0.062790519529314,-0.661311865323653,-0.982287250728689,-0.891006524188368,-0.425779291565072,
-				     0.218143241396543,0.770513242775789,0.999506560365731,0.809016994374948,0.278991106039228,-0.368124552684679,-0.860742027003944,-0.992114701314478,
-				     -0.707106781186547,-0.125333233564302,0.509041415750371,0.929776485888252,0.960293685676943,0.587785252292472,-0.031410759078127,-0.63742398974869,
-				     -0.975916761938748,-0.90482705246602,-0.453990499739545,0.187381314585724,0.750111069630461,0.998026728428271,0.827080574274561,0.309016994374948,
-				     -0.338737920245292,-0.844327925502016,-0.99556196460308,-0.72896862742141,-0.156434465040231,0.481753674101716,0.917754625683981,0.968583161128631,
-				     0.612907053652974,-4.9047770029553E-16,-0.612907053652975,-0.968583161128632,-0.91775462568398,-0.481753674101716,0.156434465040229,0.728968627421413,
-				     0.99556196460308,0.844327925502016,0.338737920245288,-0.309016994374949,-0.827080574274562,-0.998026728428272,-0.750111069630457,-0.187381314585723,
-				     0.453990499739546,0.904827052466021,0.975916761938747,0.637423989748689,0.03141075907813,-0.587785252292476,-0.960293685676943,-0.929776485888251,
-				     -0.509041415750367,0.125333233564307,0.707106781186548,0.992114701314478,0.860742027003942,0.368124552684676,-0.278991106039229,-0.809016994374946,
-				     -0.999506560365731,-0.770513242775789,-0.218143241396543,0.425779291565076,0.891006524188369,0.982287250728689,0.661311865323653,0.06279051952931,
-				     -0.562083377852132,-0.951056516295153,-0.940880768954224,-0.535826794978994,0.094108313318515,0.684547105928688,0.987688340595138,0.876306680043863,
-				     0.397147890634781,-0.24868988716486,-0.790155012375688};
-	/* Size of arrays of pre-calculated values */
-	const int[2] size = {5,100};
-
-	/* List of pointers for cos values */
-	float *const p_osc_list[sum_osc, diff_osc];
-
-	/* cos values represent half the waveform so inverse values are needed half the time */
-	bool inv = false;
-	bool exitflag = false;
+float * demod(float *p_in, int size, struct Demod *osc){
 
 	/* Pointers for input and output values */
-	float *p_in;
 	float *p_out;
+	float *p_osc = osc->p_OSC;
+	int index = osc->index;
+	int inverse = osc->inverse;
 
-	/* Choose whether to point to sum or diff cos values */
-	float *const p_osc = p_osc_list[branch];
+	/* Count of how many samples have been demodulated */
+	int counter = 0;
 
-	/* Continue until exit signal sent */
-	while(!exitflag) {
-		/* Get next input sample */
-		*p_in, exitflag = pipe.next();
+	while(counter < size) {
 
 		/* Coherent demodulation: multiply signal by generated oscillator value */
-		if (inv) {
-			*p_out = -1 * (*p_in * *p_osc);
+		if (inverse == 1) {
+			*p_out = -1 * (*p_in * *(p_osc + index));
 		}
 		else {
-			*p_out = *p_in * *p_osc;
+			*p_out = *p_in * *(p_osc + index);
 		}
 
-		/* Move pointer to next oscillator value */
-		if (p_osc < p_osc_list[branch] + size[branch]) {
-			p_osc++;
-		}
 		/* Wrap around and flip the cos values */
 		else {
-			p_osc = p_osc_list[branch];
-			inv = !inv;
+			index = 0;
+			inverse = abs(inverse - 1);
 		}
+		/* Move pointer to next oscillator value */
+		if (index < osc->SIZE) {
+			index++;
+		}
+		counter++;
+		p_in++;
+		p_out++;
 	}
 
+	osc->index = index;
+	osc->inverse = inverse;
+
+	return p_out;
 }
 
