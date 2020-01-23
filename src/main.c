@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "structs.h"
 #include "io.h"
 #include "fir.h"
@@ -15,10 +16,11 @@ int main(int argc, char *argv[]) {
 	 * START OF DECLARATIONS
 	 *****************************************************************************/
 	
+	printf("START");
 	/* FILE PATHS */
-	const char FILE_IN = *argv[0];
-	const char FILE_LEFT = *argv[1];
-	const char FILE_RIGHT = *argv[2];
+	const char FILE_IN = argv[1];
+	const char FILE_LEFT = argv[2];
+	const char FILE_RIGHT = argv[3];
 	
 	/* FIR FILTER */
 	const int F;
@@ -61,8 +63,8 @@ int main(int argc, char *argv[]) {
 		// Return a pointer to the first element in the sum and diff array
 		float *p_sum;
 		float *p_diff;
-		p_sum = fir(p_batch, batch_size, H_SUM);
-		p_diff = fir(p_batch, batch_size, H_DIFF);
+		//p_sum = fir(p_batch, batch_size, H_SUM);
+		//p_diff = fir(p_batch, batch_size, H_DIFF);
 		
 		// Demodulate sum and diff
 		float *p_sum_demod;
@@ -72,15 +74,15 @@ int main(int argc, char *argv[]) {
 		
 		// Resample sum and diff
 		float *p_sum_res;
-		float *p_dif_res;
+		float *p_diff_res;
 		p_sum_res = resample(p_sum_demod, &batch_size, &filter, &buff_res, &buff_dec);
 		p_diff_res = resample(p_diff_demod, &batch_size, &filter, &buff_res, &buff_dec);
 
 		// Get left and right signals from sum and diff
 		float *p_left;
 		float *p_right;
-		p_left = get_l(p_sum_res, p_diff_res);
-		p_right = get_r(p_sum_res, p_diff_res);
+		//p_left = get_l(p_sum_res, p_diff_res);
+		//p_right = get_r(p_sum_res, p_diff_res);
 		
 		// Write left and right to file
 		write_batch(FILE_LEFT, SIZE_WRITE, p_left);

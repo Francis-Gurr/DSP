@@ -1,6 +1,6 @@
 #include "structs.h"
 
-float resample(float *p_batch, int *p_batch_size, struct Filter *p_filter, struct Buffer *p_buff_res, struct Buffer *p_buff_dec) {
+float * resample(float *p_batch, int *p_batch_size, struct Filter *p_filter, struct Buffer *p_buff_res, struct Buffer *p_buff_dec) {
 	int batch_size_res = *p_batch_size * 0.0048;
 	float resampled[batch_size_res];
 	float *p_resampled = resampled;

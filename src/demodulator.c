@@ -1,3 +1,4 @@
+#include "demodulator.h"
 #include "structs.h"
 
 float * demod(float *p_in, int size, struct Demod *osc){
@@ -21,14 +22,14 @@ float * demod(float *p_in, int size, struct Demod *osc){
 			*p_out = *p_in * *(p_osc + index);
 		}
 
+		/* Move pointer to next oscillator value */
+		if (index < osc->SIZE) {
+			index++;
+		}
 		/* Wrap around and flip the cos values */
 		else {
 			index = 0;
 			inverse = abs(inverse - 1);
-		}
-		/* Move pointer to next oscillator value */
-		if (index < osc->SIZE) {
-			index++;
 		}
 		counter++;
 		p_in++;

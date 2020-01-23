@@ -16,7 +16,7 @@ struct Buffer {
 
 struct Filter {
     const int SIZE; // Filter size
-    float *const p_H[3]; // Array of pointers to each filter
+    const float *const p_H[3]; // Array of pointers to each filter
     int curr_res_filter;
     int curr_dec_filter;
 };
