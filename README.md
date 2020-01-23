@@ -1,7 +1,7 @@
 # DSP Coursework 
 
 ## Report
-Link to latex overleaf: [HERE](https://i.pinimg.com/originals/11/63/1f/11631f4663083360fe1b02269fb257c4.png)
+Link to latex overleaf: [HERE](https://www.overleaf.com/project/5e28304ad8f1f3000132e4e2/invite/token/15c0f079f2248b812e386dace17abccdca858eb06225bbfc?project_name=DSP&user_first_name=lauren.r.miller)
 
 ## Instructions
 
