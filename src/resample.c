@@ -1,4 +1,4 @@
-int,float resample(float *p_batch, int batch_size, int batch_size_res, struct Filter *p_filter, struct Buffer *p_buff_res, struct Buffer *p_buff_dec) {
+int,float resample(float *p_batch, int batch_size, struct Filter *p_filter, struct Buffer *p_buff_res, struct Buffer *p_buff_dec) {
 	int batch_size_res = batch_size * 0.0048;
 	float resampled[batch_size_res];
 	float *p_resampled = resampled;

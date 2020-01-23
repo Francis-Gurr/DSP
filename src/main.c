@@ -78,18 +78,14 @@ int main(int argc, char *argv[]) {
 		// Demodulate sum and diff
 		float *p_sum_demod;
 		float *p_diff_demod;
-		p_sum_demod = demod(sum, batch_size, sum_osc);
-		p_diff_demod = demod(diff, batch_size, diff_osc);
+		p_sum_demod = demod(p_sum, batch_size, SUM_OSC);
+		p_diff_demod = demod(p_diff, batch_size, DIFF_OSC);
 		
 		// Resample sum and diff
 		float *p_sum_res;
 		float *p_dif_res;
-		p_sum_res = resample(p_sum_demod, *p_filter_res, *p_filter_dec, *buff_res, *buff_dec);
-		p_diff_res = resample(p_diff_demod, *p_filter_res, *p_filter_dec, *buff_res, *buff_dec);
-		// If last batch, update the batch_size_res
-		if (*p_exit != 0) {
-			batch_size_res = batch_size * RES_FACTOR;
-		}
+		[p_sum_res, batch_size_res] = resample(p_sum_demod, batch_size, p_filter, p_buff_res, p_buff_dec);
+		[p_diff_res, batch_size_res] = resample(p_diff_demod, batch_size, p_filter, p_buff_res, p_buff_dec);
 
 		// Get left and right signals from sum and diff
 		float *p_left;
