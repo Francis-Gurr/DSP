@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include "structs.h"
 #include "io.h"
-#include "fir.h"
+#include "fir_alt.h"
 #include "demodulator.h"
 #include "resample.h"
+#include "get_lr.h"
 
 #define SIZE_FIR 5
 #define SIZE_RES 5
@@ -18,14 +19,15 @@ int main(int argc, char *argv[]) {
 	
 	printf("START");
 	/* FILE PATHS */
-	const char FILE_IN = argv[1];
-	const char FILE_LEFT = argv[2];
-	const char FILE_RIGHT = argv[3];
+	const char *const p_FILE_IN = argv[1];
+	const char *const p_FILE_LEFT = argv[2];
+	const char *const p_FILE_RIGHT = argv[3];
 	
 	/* FIR FILTER */
-	const int F;
 	const float H_SUM[SIZE_FIR] = {}; // Sum filter coefficients
 	const float H_DIFF[SIZE_FIR] = {}; // Diff filter coefficients
+	struct Buffer buff_fir_sum = {.SIZE=SIZE_FIR, .values={}, .offset=0};
+	struct Buffer buff_fir_diff = {.SIZE=SIZE_FIR, .values={}, .offset=0};
 	
 	/* DEMODULATION */
 	const float SUM_OSC[5] = {};
@@ -55,38 +57,35 @@ int main(int argc, char *argv[]) {
 	while (*p_exit == 0) {
 		// Read n=SIZE_READ samples from FILE_IN
 		// Return a pointer to the first element in the batch and the batch size
-		float *p_batch;
+		float batch[SIZE_READ] = {};
 		int batch_size;
-		batch_size = read_batch(FILE_IN, SIZE_READ, p_batch, p_exit);
+		batch_size = read_batch(p_FILE_IN, SIZE_READ, batch, p_exit);
 		
 		// Use FIR filter to split the batch into sum and diff
 		// Return a pointer to the first element in the sum and diff array
-		float *p_sum;
-		float *p_diff;
-		//p_sum = fir(p_batch, batch_size, H_SUM);
-		//p_diff = fir(p_batch, batch_size, H_DIFF);
+		float sum[batch_size];
+		float diff[batch_size];
+		fir_alt(sum, batch_size, H_SUM, &buff_fir_sum);
+		fir_alt(diff, batch_size, H_DIFF, &buff_fir_diff);
 		
 		// Demodulate sum and diff
-		float *p_sum_demod;
-		float *p_diff_demod;
-		p_sum_demod = demod(p_sum, batch_size, &sum_osc);
-		p_diff_demod = demod(p_diff, batch_size, &diff_osc);
+		demod(sum, batch_size, &sum_osc);
+		demod(diff, batch_size, &diff_osc);
 		
 		// Resample sum and diff
-		float *p_sum_res;
-		float *p_diff_res;
-		p_sum_res = resample(p_sum_demod, &batch_size, &filter, &buff_res, &buff_dec);
-		p_diff_res = resample(p_diff_demod, &batch_size, &filter, &buff_res, &buff_dec);
+		float sum_res[batch_size];
+		float diff_res[batch_size];
+		batch_size_res = resample(sum, batch_size, sum_res, &filter, &buff_res, &buff_dec);
+		batch_size_res = resample(diff, batch_size, diff_res, &filter, &buff_res, &buff_dec);
 
 		// Get left and right signals from sum and diff
-		float *p_left;
-		float *p_right;
-		//p_left = get_l(p_sum_res, p_diff_res);
-		//p_right = get_r(p_sum_res, p_diff_res);
+		float left[batch_size_res];
+		float right[batch_size_res];
+		get_lr(sum_res, diff_res, left, right, batch_size_res);
 		
 		// Write left and right to file
-		write_batch(FILE_LEFT, SIZE_WRITE, p_left);
-		write_batch(FILE_RIGHT, SIZE_WRITE, p_right);
+		write_batch(p_FILE_LEFT, batch_size_res, left);
+		write_batch(p_FILE_RIGHT, batch_size_res, right);
 	}
 	return 0;
 }

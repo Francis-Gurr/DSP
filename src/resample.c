@@ -11,7 +11,7 @@ void add_to_buffer(float p_elem, struct Buffer *buff) {
   buff->wait--;
 }
 
-void fir1(const float *p_H, struct Buffer *buff, float *resampled) {
+float fir1(const float *p_H, struct Buffer *buff) {
   float sum = 0.0;
   int i;
   for (i = buff->offset; i > 0; i--) {
@@ -20,15 +20,13 @@ void fir1(const float *p_H, struct Buffer *buff, float *resampled) {
   for (i = buff->SIZE; i > buff->offset; i--) {
     sum += buff->values[i] * *(p_H+i);
   }
-  resampled = &sum;
+  return sum;
 }
 
-float * resample(float *p_batch, int *p_batch_size, struct Filter *p_filter, struct Buffer *p_buff_res, struct Buffer *p_buff_dec) {
-	int batch_size_res = *p_batch_size * 0.0048;
-	float resampled[batch_size_res];
-	float *p_res = resampled;
+int resample(float *p_batch, int batch_size, float *p_res, struct Filter *p_filter, struct Buffer *p_buff_res, struct Buffer *p_buff_dec) {
+	int batch_size_res = batch_size * 0.0048;
 	// For each sample in the batch
-	for (int i = *p_batch_size; i--; ) {
+	for (int i = batch_size; i--; ) {
 		float sample = *(p_batch+i); // Sample is the current value from the array
 		int curr_res_filter = p_filter->curr_res_filter;
 		int curr_dec_filter = p_filter->curr_dec_filter;
@@ -39,7 +37,7 @@ float * resample(float *p_batch, int *p_batch_size, struct Filter *p_filter, str
 		// If the buffer is ready, resample
 		if (p_buff_res->wait == 0) {
 			// First resample by a factor of 3/25
-			fir1(p_filter->p_H[curr_res_filter], p_buff_res, p_res);
+			sample = fir1(p_filter->p_H[curr_res_filter], p_buff_res);
 			
 			// Increase the curr_filter and buffer wait values
 			if (++curr_res_filter > 2) {
@@ -53,19 +51,18 @@ float * resample(float *p_batch, int *p_batch_size, struct Filter *p_filter, str
 			}
 			
 			// Add the resampled sample to the decimation buffer
-			add_to_buffer(*p_res, p_buff_dec);
+			add_to_buffer(sample, p_buff_dec);
 			
 			// If the decimation buffer is ready, decimate
 			if (p_buff_dec->wait == 0) {
-				fir1(p_filter->p_H[curr_dec_filter], p_buff_dec, p_res);
+				*p_res = fir1(p_filter->p_H[curr_dec_filter], p_buff_dec);
 				p_buff_dec->wait = 25;
 				if (++curr_dec_filter > 2) {
 					curr_dec_filter = 0;
 				}
+				p_res++;
 			}
-			p_res++;
 		}
 	}
-	*p_batch_size = batch_size_res;
-	return resampled;
+	return batch_size_res;
 }

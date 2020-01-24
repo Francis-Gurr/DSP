@@ -1,11 +1,11 @@
 #include "demodulator.h"
 #include "structs.h"
+#include<stdlib.h>
 
-float * demod(float *p_in, int size, struct Demod *osc){
+void demod(float *p_in, int size, struct Demod *osc){
 
 	/* Pointers for input and output values */
-	float *p_out;
-	float *p_osc = osc->p_OSC;
+	const float *p_osc = osc->p_OSC;
 	int index = osc->index;
 	int inverse = osc->inverse;
 
@@ -16,10 +16,10 @@ float * demod(float *p_in, int size, struct Demod *osc){
 
 		/* Coherent demodulation: multiply signal by generated oscillator value */
 		if (inverse == 1) {
-			*p_out = -1 * (*p_in * *(p_osc + index));
+			*p_in = -1 * (*p_in * *(p_osc + index));
 		}
 		else {
-			*p_out = *p_in * *(p_osc + index);
+			*p_in = *p_in * *(p_osc + index);
 		}
 
 		/* Move pointer to next oscillator value */
@@ -33,12 +33,9 @@ float * demod(float *p_in, int size, struct Demod *osc){
 		}
 		counter++;
 		p_in++;
-		p_out++;
 	}
 
 	osc->index = index;
 	osc->inverse = inverse;
-
-	return p_out;
 }
 

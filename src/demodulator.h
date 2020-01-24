@@ -1,3 +1,4 @@
 #include "structs.h"
+#include<stdlib.h>
 
-float * demod(float *p_in, int size, struct Demod *osc);
+void  demod(float *p_in, int size, struct Demod *osc);

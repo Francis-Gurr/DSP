@@ -1,4 +1,4 @@
-#include "fir.h"
+/*#include "fir.h"
 
 // Handy macro to find number of elements in an array
 #define ELEMOF(X) (sizeof(X)/sizeof(X[0])) 
@@ -23,4 +23,4 @@ void fir_filter(
         size_t j = (p_buffer->offset + i) % ELEMOF(p_buffer->samples);
         *p_output += weights[i] * p_buffer->samples[j];
     }
-}
+}*/

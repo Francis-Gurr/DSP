@@ -1,5 +1,5 @@
 # define the name of your source file(s)
-SRCS = ./src/main.c ./src/demodulator.c ./src/resample.c ./src/fir.c ./src/io.c ./src/get_r.c ./src/get_l.c
+SRCS = ./src/main.c ./src/demodulator.c ./src/resample.c ./src/fir_alt.c ./src/io.c ./src/get_lr.c 
 
 # define the name of the object files(s) - we can do this automatically
 OBJS = $(SRCS:.c=.o)

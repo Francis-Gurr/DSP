@@ -1,4 +1,4 @@
-#include <stdlib.h>
+/*#include <stdlib.h>
 
 
 // Handy buffer length macro, and a fixed filter length
@@ -22,4 +22,4 @@ void fir_filter(
     float weights[FIR_FILTER_LEN],
     struct fir_buffer *p_buffer,
     float *p_output
-);
+);*/
