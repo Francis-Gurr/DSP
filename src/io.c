@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include<unistd.h>
 #include<fcntl.h>
 
@@ -8,7 +9,12 @@ int read_batch(const char *FILE_ID, const int SIZE, float *p_batch, int *p_exit)
 	sz = read(fd, p_batch, SIZE);
 
 	if (sz != SIZE) {
+		printf("didn't read an entire batch");
 		*p_exit = 1;
+		for (int i = sz; i < SIZE; i++){
+			*(p_batch+i) = 0.0;
+		}
+
 	}
 
 	close(fd);
