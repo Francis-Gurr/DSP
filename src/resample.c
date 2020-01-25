@@ -23,46 +23,34 @@ float fir1(const float *p_H, struct Buffer *buff) {
   return sum;
 }
 
-int resample(float *p_batch, int batch_size, float *p_res, struct Filter *p_filter, struct Buffer *p_buff_res, struct Buffer *p_buff_dec) {
+int resample(float *p_batch, int batch_size, float *p_res, struct Filter *p_filter, struct Buffer *p_buff) {
 	int batch_size_res = batch_size * 0.0048;
+	float *resampled = p_res;
 	// For each sample in the batch
 	for (int i = batch_size; i--; ) {
 		float sample = *(p_batch+i); // Sample is the current value from the array
 		int curr_res_filter = p_filter->curr_res_filter;
-		int curr_dec_filter = p_filter->curr_dec_filter;
 
 		// Add the sample to the resampling buffer
-		add_to_buffer(sample, p_buff_res);
+		add_to_buffer(sample, p_buff);
 		
 		// If the buffer is ready, resample
-		if (p_buff_res->wait == 0) {
-			// First resample by a factor of 3/25
-			sample = fir1(p_filter->p_H[curr_res_filter], p_buff_res);
+		if (p_buff->wait == 0) {
+			// Resample by a factor of 3/625
+			 resampled = fir1(p_filter->p_H[curr_res_filter], p_buff);
 			
 			// Increase the curr_filter and buffer wait values
 			if (++curr_res_filter > 2) {
 				curr_res_filter = 0;
 			}
 			if (curr_res_filter == 2) {
-				p_buff_res->wait = 9;
+				p_buff->wait = 209;
 			}
 			else {
-				p_buff_res->wait = 8;
+				p_buff->wait = 208;
 			}
-			
-			// Add the resampled sample to the decimation buffer
-			add_to_buffer(sample, p_buff_dec);
-			
-			// If the decimation buffer is ready, decimate
-			if (p_buff_dec->wait == 0) {
-				*p_res = fir1(p_filter->p_H[curr_dec_filter], p_buff_dec);
-				p_buff_dec->wait = 25;
-				if (++curr_dec_filter > 2) {
-					curr_dec_filter = 0;
-				}
-				p_res++;
-			}
-		}
+			resampled++;
+		}	
 	}
 	return batch_size_res;
 }
