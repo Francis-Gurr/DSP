@@ -37,7 +37,7 @@ int resample(float *p_batch, int batch_size, float *p_res, struct Filter *p_filt
 		// If the buffer is ready, resample
 		if (p_buff->wait == 0) {
 			// Resample by a factor of 3/625
-			 resampled = fir1(p_filter->p_H[curr_res_filter], p_buff);
+			 *resampled = fir1(p_filter->p_H[curr_res_filter], p_buff);
 			
 			// Increase the curr_filter and buffer wait values
 			if (++curr_res_filter > 2) {
