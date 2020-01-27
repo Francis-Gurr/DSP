@@ -7,11 +7,11 @@
 #include "resample.h"
 #include "get_lr.h"
 
-#define SIZE_FIR 257
-#define SIZE_RES 5
+#define SIZE_FIR 1500
+#define SIZE_RES 500 
 #define SIZE_DEC 5
-#define SIZE_READ 1875
-#define SIZE_WRITE 9
+#define SIZE_READ 208125
+#define SIZE_WRITE 999
 
 int main(int argc, char *argv[]) {
 	/****************************************************************************
@@ -27,8 +27,10 @@ int main(int argc, char *argv[]) {
 	printf("Arguments read!\n");
 	
 	/* FIR FILTER */
-	float *p_H_SUM = get_H_SUM();
-	float *p_H_DIFF = get_H_DIFF();
+	const float H_SUM[SIZE_FIR] = {0};
+	const float H_DIFF[SIZE_FIR] = {0};
+	get_H_SUM(H_SUM);
+	get_H_DIFF(H_DIFF);
 	struct Buffer buff_fir_sum = {.SIZE=SIZE_FIR, .values={0}, .offset=0, .wait=0};
 	struct Buffer buff_fir_diff = {.SIZE=SIZE_FIR, .values={0}, .offset=0, .wait=0};
 	
@@ -49,9 +51,9 @@ int main(int argc, char *argv[]) {
 	struct Demod diff_osc = {.SIZE=100, .p_OSC=DIFF_OSC, .index=0, .inverse=0};	
 
 	/* RESAMPLE */
-	float H0[SIZE_RES] = {0};
-	float H1[SIZE_RES] = {0};
-	float H2[SIZE_RES] = {0};
+	const float H0[SIZE_RES] = {0};
+	const float H1[SIZE_RES] = {0};
+	const float H2[SIZE_RES] = {0};
 	get_H_RES(H0, H1, H2);
 	struct Filter filter = {
 		.SIZE = SIZE_RES,
@@ -68,7 +70,7 @@ int main(int argc, char *argv[]) {
 
 	int exit = 0;
 	int batch_size_res = 9; 
-	int counter = 1;
+	int counter = 0;
 	while (exit == 0) {
 		// Read n=SIZE_READ samples from FILE_IN
 		// Return a pointer to the first element in the batch and the batch size
@@ -83,8 +85,8 @@ int main(int argc, char *argv[]) {
 		// printf("Starting FIR...\n");
 		float sum[SIZE_READ] = {0};
 		float diff[SIZE_READ] = {0};
-		fir_alt(sum, batch_size, p_H_SUM, &buff_fir_sum);
-		fir_alt(diff, batch_size, p_H_DIFF, &buff_fir_diff);
+		fir_alt(sum, batch_size, H_SUM, &buff_fir_sum);
+		fir_alt(diff, batch_size, H_DIFF, &buff_fir_diff);
 		// printf("Inputs filtered!\n");
 		
 		// Demodulate sum and diff
@@ -113,7 +115,7 @@ int main(int argc, char *argv[]) {
 		write_batch(p_FILE_LEFT, batch_size_res, left);
 		write_batch(p_FILE_RIGHT, batch_size_res, right);
 
-		printf("Batch %d complete\n", counter);
+		printf("Batch %d complete\n", counter++);
 	}
 	printf("FIN.");
 	return 0;
