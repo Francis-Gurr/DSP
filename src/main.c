@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
 	/* FILE PATHS */
 	printf("Reading arguments...\n");
-	char *p_FILE_IN = argv[1];
+	const char *p_FILE_IN = argv[1];
 	char *p_FILE_LEFT = argv[2];
 	char *p_FILE_RIGHT = argv[3];
 	printf("Arguments read!\n");
@@ -72,16 +72,17 @@ int main(int argc, char *argv[]) {
 	int exit = 0;
 	int batch_size_res = 9; 
 	int counter = 0;
-	char filename[50];
+	char filename[100];
+	FILE *fd = fopen(p_FILE_IN, "r");
 	while (exit == 0) {
 		// Read n=SIZE_READ samples from FILE_IN
 		// Return a pointer to the first element in the batch and the batch size
 		// printf("Reading inputs...\n");
 		float batch[SIZE_READ] = {0};
 		int batch_size;
-		batch_size = read_batch(p_FILE_IN, SIZE_READ, batch, &exit);
-		sprintf(filename, "test/input%d.csv",counter);
-		write_to_csv(batch, batch_size, filename);
+		batch_size = read_batch(fd, SIZE_READ, batch, &exit);
+		// sprintf(filename, "src/test/input%d.csv", counter);
+		// write_to_csv(batch, batch_size, filename);
 		// printf("Inputs read\n");
 
 		// Use FIR filter to split the batch into sum and diff
@@ -91,6 +92,8 @@ int main(int argc, char *argv[]) {
 		float diff[SIZE_READ] = {0};
 		fir_alt(sum, batch_size, H_SUM, &buff_fir_sum);
 		fir_alt(diff, batch_size, H_DIFF, &buff_fir_diff);
+		// sprintf(filename, "src/test/fir%d.csv", counter);
+		// write_to_csv(batch, batch_size, filename);
 		// printf("Inputs filtered!\n");
 		
 		// Demodulate sum and diff
@@ -114,6 +117,10 @@ int main(int argc, char *argv[]) {
 		get_lr(sum_res, diff_res, left, right, batch_size_res);
 		// printf("Left and right produced!\n");
 		
+		sprintf(filename, "src/test/left.csv");
+		write_to_csv(left, batch_size_res, filename);
+		sprintf(filename, "src/test/right.csv");
+		write_to_csv(right, batch_size_res, filename);
 		// Write left and right to file
 		// printf("Writing to file...\n");
 		write_batch(p_FILE_LEFT, batch_size_res, left);
@@ -121,6 +128,7 @@ int main(int argc, char *argv[]) {
 
 		printf("Batch %d complete\n", counter++);
 	}
+	fclose(fd);
 	printf("FIN.");
 	return 0;
 }
