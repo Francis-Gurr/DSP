@@ -4,7 +4,7 @@
 Fs = 10;  % Sampling Frequency
 N    = 1499;     % Order
 Fc1  = 0.98;     % First Cutoff Frequency
-Fc2  = 1.03;     % Second Cutoff Frequency
+Fc2  = 1.02;     % Second Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
@@ -45,28 +45,20 @@ N = 1500;
 fileID = fopen('init.c','w');
 
 % float * get_H_SUM()
-fprintf(fileID,'float * get_H_SUM() {\n');
-fprintf(fileID,'\tconst float H_SUM[%d] = {\n\t\t', N);
-for i = 1:N-1
-    fprintf(fileID,'%.6f,', H_SUM(i));
-    if mod(i,15)==0
-        fprintf(fileID,'\n\t\t');
-    end
+fprintf(fileID,'void get_H_SUM(const float *p_H_SUM) {\n');
+fprintf(fileID,'\t*p_H_SUM = %.6f;\n', H_SUM(1));
+for i = 2:N
+    fprintf(fileID,'\t*(p_H_SUM + %d) = %.6f;\n', i-1, H_SUM(i));
 end
-fprintf(fileID,'%.6f};\n', H_SUM(N));
-fprintf(fileID,'\treturn H_SUM;\n}\n\n');
+fprintf(fileID,'}\n\n');
 
 % float * get_H_DIFF()
-fprintf(fileID,'float * get_H_DIFF() {\n');
-fprintf(fileID,'\tconst float H_DIFF[%d] = {\n\t\t', N);
-for i = 1:N-1
-    fprintf(fileID,'%.6f,', H_DIFF(i));
-    if mod(i,15)==0
-        fprintf(fileID,'\n\t\t');
-    end
+fprintf(fileID,'void get_H_DIFF(const float *p_H_DIFF) {\n');
+fprintf(fileID,'\t*p_H_DIFF = %.6f;\n', H_DIFF(1));
+for i = 2:N
+    fprintf(fileID,'\t*(p_H_DIFF + %d) = %.6f;\n', i-1, H_DIFF(i));
 end
-fprintf(fileID,'%.6f};\n', H_DIFF(N));
-fprintf(fileID,'\treturn H_DIFF;\n}\n\n');
+fprintf(fileID,'}\n\n');
 
 % void get_H_RES(float *p_H0, float *p_H1, float *p_H2)
 N = N/3;
