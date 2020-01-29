@@ -18,10 +18,10 @@ int read_batch(FILE *fd, const int SIZE, float *p_batch, int *p_exit) {
 }
 
 int write_batch(const char *FILE_ID, int size, float *p_batch) {
-	int fd, sz;
+	int sz;
 
-	fd = fopen(FILE_ID, "a");
-	sz = fwrite(p_batch, 4, SIZE, fd);
+	FILE *fd = fopen(FILE_ID, "a");
+	sz = fwrite(p_batch, 4, size, fd);
 	fclose(fd);
 
 	if (sz != size) {

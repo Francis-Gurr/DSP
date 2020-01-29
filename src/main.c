@@ -2,7 +2,7 @@
 #include "structs.h"
 #include "h/init.h"
 #include "io.h"
-#include "fir_alt.h"
+#include "fir.h"
 #include "demodulator.h"
 #include "resample.h"
 #include "get_lr.h"
@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
 	/* FILE PATHS */
 	printf("Reading arguments...\n");
 	const char *p_FILE_IN = argv[1];
-	char *p_FILE_LEFT = argv[2];
-	char *p_FILE_RIGHT = argv[3];
+	const char *p_FILE_LEFT = argv[2];
+	const char *p_FILE_RIGHT = argv[3];
 	printf("Arguments read!\n");
 	
 	/* FIR FILTER */
@@ -77,25 +77,21 @@ int main(int argc, char *argv[]) {
 	while (exit == 0) {
 		// Read n=SIZE_READ samples from FILE_IN
 		// Return a pointer to the first element in the batch and the batch size
-		// printf("Reading inputs...\n");
 		float batch[SIZE_READ] = {0};
 		int batch_size;
 		batch_size = read_batch(fd, SIZE_READ, batch, &exit);
-		// sprintf(filename, "src/test/input%d.csv", counter);
-		// write_to_csv(batch, batch_size, filename);
-		// printf("Inputs read\n");
 
 		// Use FIR filter to split the batch into sum and diff
 		// Return a pointer to the first element in the sum and diff array
-		// printf("Starting FIR...\n");
 		float sum[SIZE_READ] = {0};
 		float diff[SIZE_READ] = {0};
-		fir_alt(sum, batch_size, H_SUM, &buff_fir_sum);
-		fir_alt(diff, batch_size, H_DIFF, &buff_fir_diff);
-		// sprintf(filename, "src/test/fir%d.csv", counter);
-		// write_to_csv(batch, batch_size, filename);
-		// printf("Inputs filtered!\n");
-		
+		fir(batch, sum, SIZE_READ, H_SUM, &buff_fir_sum);
+		fir(batch, diff, SIZE_READ, H_DIFF, &buff_fir_diff);
+		sprintf(filename, "src/test/fir_sum.csv");
+		write_to_csv(sum, SIZE_READ, filename);
+		sprintf(filename, "src/test/fir_diff.csv");
+		write_to_csv(diff, SIZE_READ, filename);
+/*	
 		// Demodulate sum and diff
 		// printf("Entering demodulator...\n");
 		demod(sum, batch_size, &sum_osc);
@@ -117,15 +113,15 @@ int main(int argc, char *argv[]) {
 		get_lr(sum_res, diff_res, left, right, batch_size_res);
 		// printf("Left and right produced!\n");
 		
-		sprintf(filename, "src/test/left.csv");
-		write_to_csv(left, batch_size_res, filename);
-		sprintf(filename, "src/test/right.csv");
-		write_to_csv(right, batch_size_res, filename);
+		//sprintf(filename, "src/test/left.csv");
+		//write_to_csv(left, batch_size_res, filename);
+		//sprintf(filename, "src/test/right.csv");
+		//write_to_csv(right, batch_size_res, filename);
 		// Write left and right to file
 		// printf("Writing to file...\n");
-		write_batch(p_FILE_LEFT, batch_size_res, left);
-		write_batch(p_FILE_RIGHT, batch_size_res, right);
-
+		//write_batch(p_FILE_LEFT, batch_size_res, left);
+		//write_batch(p_FILE_RIGHT, batch_size_res, right);
+*/
 		printf("Batch %d complete\n", counter++);
 	}
 	fclose(fd);
