@@ -28,10 +28,13 @@ int main(int argc, char *argv[]) {
 	printf("Arguments read!\n");
 	
 	/* FIR FILTER */
-	const float H_SUM[SIZE_FIR] = {0};
+	const float *H_SUM;
 	const float H_DIFF[SIZE_FIR] = {0};
-	get_H_SUM(H_SUM);
+//	H_SUM = get_H_SUM();
 	get_H_DIFF(H_DIFF);
+	for (int i = 0; i< SIZE_FIR; i++) {
+		printf("%f\n", *(H_DIFF+i));
+	}
 	struct Buffer buff_fir_sum = {.SIZE=SIZE_FIR, .values={0}, .offset=0, .wait=0};
 	struct Buffer buff_fir_diff = {.SIZE=SIZE_FIR, .values={0}, .offset=0, .wait=0};
 	
