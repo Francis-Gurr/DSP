@@ -44,23 +44,23 @@ H_RES  = fir1(N, Fc/(Fs/2), 'low', win, flag);
 N = 1500;
 fileID = fopen('init.c','w');
 
-% void get_H_SUM(const double *p_H_SUM)
-fprintf(fileID,'void get_H_SUM(const double *p_H_SUM) {\n');
+% void get_H_SUM(double *p_H_SUM)
+fprintf(fileID,'void get_H_SUM(double *p_H_SUM) {\n');
 fprintf(fileID,'\t*p_H_SUM = %.15f;\n', H_SUM(1));
 for i = 2:N
     fprintf(fileID,'\t*(p_H_SUM + %d) = %.15f;\n', i-1, H_SUM(i));
 end
 fprintf(fileID,'}\n\n');
 
-% void get_H_DIFF(const double *p_H_DIFF)
-fprintf(fileID,'void get_H_DIFF(const double *p_H_DIFF) {\n');
+% void get_H_DIFF(double *p_H_DIFF)
+fprintf(fileID,'void get_H_DIFF(double *p_H_DIFF) {\n');
 fprintf(fileID,'\t*p_H_DIFF = %.15f;\n', H_DIFF(1));
 for i = 2:N
     fprintf(fileID,'\t*(p_H_DIFF + %d) = %.15f;\n', i-1, H_DIFF(i));
 end
 fprintf(fileID,'}\n\n');
 
-% void get_H_RES(const double *p_H0, const double *p_H1, const double *p_H2)
+% void get_H_RES(double *p_H0, double *p_H1, double *p_H2)
 N = N/3;
 H0 = zeros(1, N);
 H1 = zeros(1, N);
@@ -70,7 +70,7 @@ for i = 1:N-1
     H1(i) = H_RES((i*3)-1);
     H2(i) = H_RES(i*3);
 end
-fprintf(fileID,'void get_H_RES(const double *p_H0, const double *p_H1, const double *p_H2) {\n');
+fprintf(fileID,'void get_H_RES(double *p_H0, double *p_H1, double *p_H2) {\n');
 % H0
 fprintf(fileID,'\t*p_H0 = %.15f;\n', H0(1));
 for i = 2:N
@@ -94,7 +94,7 @@ fclose(fileID);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CREATE init.h FILE
 fileID = fopen('init.h','w');
-fprintf(fileID,'void get_H_SUM(const double *p_H_SUM);');
-fprintf(fileID,'void get_H_DIFF(const double *p_H_DIFF);');
-fprintf(fileID,'void get_H_RES(const double *p_H0, const double *p_H1, const double *p_H2);');
+fprintf(fileID,'void get_H_SUM(double *p_H_SUM);');
+fprintf(fileID,'void get_H_DIFF(double *p_H_DIFF);');
+fprintf(fileID,'void get_H_RES(double *p_H0, double *p_H1, double *p_H2);');
 fclose(fileID);
