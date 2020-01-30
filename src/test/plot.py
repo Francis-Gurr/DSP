@@ -1,13 +1,10 @@
+import pandas as pd
+import matplotlib
+matplotlib.use('tkagg')
 import matplotlib.pyplot as plt
-import csv
 
 x = []
-
-f = open('fir_sum.csv', 'rb')
-reader=csv.reader(f)
-x =[]
-for row in reader:
-    for i in range(350000,400000):
-        x.append(row[i])
+for chunk in pd.read_csv('fir_sum.csv', chunksize=208125):
+    x.extend(chunk)
 plt.plot(x);
 plt.show()

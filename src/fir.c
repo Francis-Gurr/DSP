@@ -1,6 +1,6 @@
 #include "structs.h"
 #include<stdio.h>
-void fir(float *p_batch_in, float *p_batch_out, const int batch_size, const float *p_H, struct Buffer *p_buff) {
+void fir(float *p_batch_in, double *p_batch_out, const int batch_size, const double *p_H, struct Buffer *p_buff) {
 	int i;
 	int j;
 	int offset = p_buff->offset;
@@ -10,10 +10,15 @@ void fir(float *p_batch_in, float *p_batch_out, const int batch_size, const floa
 		p_buff->values[offset] = *(p_batch_in + i);
 		
 		// Get fir sum
-		float sum = 0;
+		double sum = 0;
 		int i_H = 0;
 		for (j = offset; j >= 0; j--) {
 			sum += p_buff->values[j] * *(p_H+i_H);
+//			if (p_buff->values[j] > 0.000001) {
+//				printf("value=%f\n", p_buff->values[j]);
+//				printf("coeff=%f\n", *(p_H+i_H));
+//				printf("sum=%0.14f\n\n", sum);
+//			}
 			i_H++;
 		}
 		for (j = SIZE-1; j > offset; j--) {
@@ -24,6 +29,9 @@ void fir(float *p_batch_in, float *p_batch_out, const int batch_size, const floa
 			offset = 0;
 		}
 		*(p_batch_out + i) = sum;
+		if (sum > 0.00000000000001){
+			printf("%.15f\n", sum);
+		}
 	}
 	p_buff->offset = offset;
 }

@@ -1,4 +1,4 @@
-void get_H_SUM(const float *p_H_SUM) {
+void get_H_SUM(double *p_H_SUM) {
 	*p_H_SUM = 0.000000;
 	*(p_H_SUM + 1) = 0.000001;
 	*(p_H_SUM + 2) = 0.000000;
@@ -1501,7 +1501,7 @@ void get_H_SUM(const float *p_H_SUM) {
 	*(p_H_SUM + 1499) = 0.000000;
 }
 
-void get_H_DIFF(const float *p_H_DIFF) {
+void get_H_DIFF(double *p_H_DIFF) {
 	*p_H_DIFF = -0.000000;
 	*(p_H_DIFF + 1) = -0.000001;
 	*(p_H_DIFF + 2) = -0.000002;

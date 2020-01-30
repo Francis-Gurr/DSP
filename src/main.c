@@ -28,13 +28,10 @@ int main(int argc, char *argv[]) {
 	printf("Arguments read!\n");
 	
 	/* FIR FILTER */
-	const float *H_SUM;
-	const float H_DIFF[SIZE_FIR] = {0};
-//	H_SUM = get_H_SUM();
+	double H_SUM[SIZE_FIR] = {0};
+	double H_DIFF[SIZE_FIR] = {0};
+	get_H_SUM(H_SUM);
 	get_H_DIFF(H_DIFF);
-	for (int i = 0; i< SIZE_FIR; i++) {
-		printf("%f\n", *(H_DIFF+i));
-	}
 	struct Buffer buff_fir_sum = {.SIZE=SIZE_FIR, .values={0}, .offset=0, .wait=0};
 	struct Buffer buff_fir_diff = {.SIZE=SIZE_FIR, .values={0}, .offset=0, .wait=0};
 	
@@ -86,8 +83,8 @@ int main(int argc, char *argv[]) {
 
 		// Use FIR filter to split the batch into sum and diff
 		// Return a pointer to the first element in the sum and diff array
-		float sum[SIZE_READ] = {0};
-		float diff[SIZE_READ] = {0};
+		double sum[SIZE_READ] = {0};
+		double diff[SIZE_READ] = {0};
 		fir(batch, sum, SIZE_READ, H_SUM, &buff_fir_sum);
 		fir(batch, diff, SIZE_READ, H_DIFF, &buff_fir_diff);
 		sprintf(filename, "src/test/fir_sum.csv");
@@ -125,7 +122,7 @@ int main(int argc, char *argv[]) {
 		//write_batch(p_FILE_LEFT, batch_size_res, left);
 		//write_batch(p_FILE_RIGHT, batch_size_res, right);
 */
-		printf("Batch %d complete\n", counter++);
+		printf("Batch %d complete\n****************************************************************************************************************\n**********************************************************************************************\n************************************************************************************************************\n", counter++);
 	}
 	fclose(fd);
 	printf("FIN.");
