@@ -1,1 +1,1 @@
-void get_H_SUM(const double *p_H_SUM);void get_H_DIFF(const double *p_H_DIFF);void get_H_RES(const double *p_H0, const double *p_H1, const double *p_H2);
+void get_H_SUM(double *p_H_SUM);void get_H_DIFF(double *p_H_DIFF);void get_H_RES(double *p_H0, double *p_H1, double *p_H2);

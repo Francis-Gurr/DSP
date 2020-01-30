@@ -1,4 +1,4 @@
-void get_H_SUM(const double *p_H_SUM) {
+void get_H_SUM(double *p_H_SUM) {
 	*p_H_SUM = 0.000000279984556;
 	*(p_H_SUM + 1) = 0.000000526953088;
 	*(p_H_SUM + 2) = 0.000000000000000;
@@ -1501,7 +1501,7 @@ void get_H_SUM(const double *p_H_SUM) {
 	*(p_H_SUM + 1499) = 0.000000279984556;
 }
 
-void get_H_DIFF(const double *p_H_DIFF) {
+void get_H_DIFF(double *p_H_DIFF) {
 	*p_H_DIFF = -0.000000095359018;
 	*(p_H_DIFF + 1) = -0.000000749305945;
 	*(p_H_DIFF + 2) = -0.000001511802074;
@@ -3004,7 +3004,7 @@ void get_H_DIFF(const double *p_H_DIFF) {
 	*(p_H_DIFF + 1499) = -0.000000095359018;
 }
 
-void get_H_RES(const double *p_H0, const double *p_H1, const double *p_H2) {
+void get_H_RES(double *p_H0, double *p_H1, double *p_H2) {
 	*p_H0 = 0.000022653650570;
 	*(p_H0 + 1) = 0.000006347911412;
 	*(p_H0 + 2) = -0.000024751865557;
