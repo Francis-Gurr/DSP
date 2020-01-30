@@ -29,9 +29,9 @@ void fir(float *p_batch_in, double *p_batch_out, const int batch_size, const dou
 			offset = 0;
 		}
 		*(p_batch_out + i) = sum;
-		if (sum > 0.00000000000001){
-			printf("%.15f\n", sum);
-		}
+//		if (sum > 0.00000000000001){
+//			printf("%.15f\n", sum);
+//		}
 	}
 	p_buff->offset = offset;
 }

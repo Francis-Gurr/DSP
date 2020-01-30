@@ -52,9 +52,9 @@ int main(int argc, char *argv[]) {
 	struct Demod diff_osc = {.SIZE=100, .p_OSC=DIFF_OSC, .index=0, .inverse=0};	
 
 	/* RESAMPLE */
-	const float H0[SIZE_RES] = {0};
-	const float H1[SIZE_RES] = {0};
-	const float H2[SIZE_RES] = {0};
+	double H0[SIZE_RES] = {0};
+	double H1[SIZE_RES] = {0};
+	double H2[SIZE_RES] = {0};
 	get_H_RES(H0, H1, H2);
 	struct Filter filter = {
 		.SIZE = SIZE_RES,
