@@ -8,10 +8,10 @@ OBJS = $(SRCS:.c=.o)
 CCOMP = gcc
 
 # flags for the compiler
-CFLAGS = -Wall -O3 -fstrict-aliasing
+CFLAGS = -Wall -fopenmp -O3 -fstrict-aliasing
 
 # flags for the linker - note -lm for the math library
-LDFLAGS = -O3 -lm -L/usr/lib
+LDFLAGS = -O3 -fopenmp -L/usr/lib
 
 # the name of your executable file (the target) - here we put it in the top directory
 TARGET = main

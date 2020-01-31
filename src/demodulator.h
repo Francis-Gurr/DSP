@@ -1,4 +1,5 @@
 #include "structs.h"
 #include<stdlib.h>
+#include<stdbool.h>
 
-void  demod(float *p_in, int size, struct Demod *osc);
+void  demod(double *p_in, const int SIZE, struct Demod *osc);

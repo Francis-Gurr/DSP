@@ -1,41 +1,36 @@
 #include "demodulator.h"
 #include "structs.h"
 #include<stdlib.h>
+#include<stdbool.h>
 
-void demod(float *p_in, int size, struct Demod *osc){
+void demod(double *p_in, const int SIZE, struct Demod *osc){
 
-	/* Pointers for input and output values */
-	const float *p_osc = osc->p_OSC;
-	int index = osc->index;
-	int inverse = osc->inverse;
+	#pragma omp parallel shared(p_in, osc)
+	{
+		/* Pointers for input and output values */
+		const double *p_osc = osc->p_OSC;
+		int i_osc = osc->index;
+		bool inverse = osc->inverse;
 
-	/* Count of how many samples have been demodulated */
-	int counter = 0;
+		/* Count of how many samples have been demodulated */
+		#pragma omp for
+		for (int i_s = 0; i_s < SIZE; i_s++) {
+			double sample = *(p_in + i_s);
+			/* Coherent demodulation: multiply signal by generated oscillator value */
+			sample = sample * *(p_osc + i_osc);
+			if (inverse) {
+				sample = -1 * sample;
+			}
+			*(p_in + i_s) = sample;
 
-	while(counter < size) {
-
-		/* Coherent demodulation: multiply signal by generated oscillator value */
-		if (inverse == 1) {
-			*p_in = -1 * (*p_in * *(p_osc + index));
-		}
-		else {
-			*p_in = *p_in * *(p_osc + index);
-		}
-
-		/* Move pointer to next oscillator value */
-		if (index < osc->SIZE) {
-			index++;
-		}
-		/* Wrap around and flip the cos values */
-		else {
-			index = 0;
-			inverse = abs(inverse - 1);
-		}
-		counter++;
-		p_in++;
+			/* Move pointer to next oscillator value */
+			if (++i_osc >= osc->SIZE) {
+				i_osc = 0;
+				inverse = !inverse;
+			}
+		}	
+		osc->index = i_osc;
+		osc->inverse = inverse;
 	}
-
-	osc->index = index;
-	osc->inverse = inverse;
 }
 

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include<stdbool.h>
 #include "structs.h"
 #include "h/init.h"
 #include "io.h"
@@ -8,10 +9,9 @@
 #include "get_lr.h"
 #include "test/csv.h"
 
+#define SIZE_READ 208125
 #define SIZE_FIR 1500
 #define SIZE_RES 500 
-#define SIZE_DEC 5
-#define SIZE_READ 208125
 #define SIZE_WRITE 999
 
 int main(int argc, char *argv[]) {
@@ -36,8 +36,8 @@ int main(int argc, char *argv[]) {
 	struct Buffer buff_fir_diff = {.SIZE=SIZE_FIR, .values={0}, .offset=0, .wait=0};
 	
 	/* DEMODULATION */
-	const float SUM_OSC[5] = {1.000000,0.809017,0.309017,-0.309017,-0.809017};
-	const float DIFF_OSC[100] = {
+	const double SUM_OSC[5] = {1.000000,0.809017,0.309017,-0.309017,-0.809017};
+	const double DIFF_OSC[100] = {
 		1.000000,0.790155,0.248690,-0.397148,-0.876307,-0.987688,-0.684547,-0.094108,0.535827,0.940881,
 		0.951057,0.562083,-0.062791,-0.661312,-0.982287,-0.891007,-0.425779,0.218143,0.770513,0.999507,
 		0.809017,0.278991,-0.368125,-0.860742,-0.992115,-0.707107,-0.125333,0.509041,0.929776,0.960294,
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 	struct Demod diff_osc = {.SIZE=100, .p_OSC=DIFF_OSC, .index=0, .inverse=0};	
 
 	/* RESAMPLE */
-	double H0[SIZE_RES] = {0};
+/*	double H0[SIZE_RES] = {0};
 	double H1[SIZE_RES] = {0};
 	double H2[SIZE_RES] = {0};
 	get_H_RES(H0, H1, H2);
@@ -64,22 +64,20 @@ int main(int argc, char *argv[]) {
 	};
 	struct Buffer buff_res = {.SIZE=SIZE_RES, .values={0}, .offset=0, .wait=1}; // Resample buffer
 	struct Buffer buff_dec = {.SIZE=SIZE_DEC, .values={0}, .offset=0, .wait=1}; // Decimation buffer
-
+*/
 	/****************************************************************************
 	* END OF DECLARATIONS
 	*****************************************************************************/
 
 	int exit = 0;
-	int batch_size_res = 9; 
-	int counter = 0;
-	char filename[100];
-	FILE *fd = fopen(p_FILE_IN, "r");
+	FILE *fd = fopen(p_FILE_IN, "rb");
+	const char *p_FILE_SUM = "src/test/demod_sum.dat";
+	const char *p_FILE_DIFF = "src/test/demod_diff.dat";
 	while (exit == 0) {
 		// Read n=SIZE_READ samples from FILE_IN
 		// Return a pointer to the first element in the batch and the batch size
 		float batch[SIZE_READ] = {0};
-		int batch_size;
-		batch_size = read_batch(fd, SIZE_READ, batch, &exit);
+		read_batch(fd, SIZE_READ, batch, &exit);
 
 		// Use FIR filter to split the batch into sum and diff
 		// Return a pointer to the first element in the sum and diff array
@@ -87,17 +85,15 @@ int main(int argc, char *argv[]) {
 		double diff[SIZE_READ] = {0};
 		fir(batch, sum, SIZE_READ, H_SUM, &buff_fir_sum);
 		fir(batch, diff, SIZE_READ, H_DIFF, &buff_fir_diff);
-		sprintf(filename, "src/test/fir_sum.csv");
-		write_to_csv(sum, SIZE_READ, filename);
-		sprintf(filename, "src/test/fir_diff.csv");
-		write_to_csv(diff, SIZE_READ, filename);
-/*	
+	
 		// Demodulate sum and diff
 		// printf("Entering demodulator...\n");
-		demod(sum, batch_size, &sum_osc);
-		demod(diff, batch_size, &diff_osc);
-		// printf("Demodulation complete!\n");
+		demod(sum, SIZE_READ, &sum_osc);
+		demod(diff, SIZE_READ, &diff_osc);
+		write_batch(p_FILE_SUM, SIZE_READ, sum);
+		write_batch(p_FILE_DIFF, SIZE_READ, diff);
 		
+		/*
 		// Resample sum and diff
 		// printf("Starting resample...\n");
 		float sum_res[SIZE_READ] = {0};
@@ -122,7 +118,7 @@ int main(int argc, char *argv[]) {
 		//write_batch(p_FILE_LEFT, batch_size_res, left);
 		//write_batch(p_FILE_RIGHT, batch_size_res, right);
 */
-		printf("Batch %d complete\n****************************************************************************************************************\n**********************************************************************************************\n************************************************************************************************************\n", counter++);
+//		printf("Batch %d complete\n************************************************************************************************************\n", counter++);
 	}
 	fclose(fd);
 	printf("FIN.");

@@ -1,10 +1,11 @@
 #ifndef _STRUCTS
 #define _STRUCTS
+#include<stdbool.h>
 struct Demod {
 	const int SIZE;
-	const float *p_OSC;
+	const double *p_OSC;
 	int index;
-	int inverse;
+	bool inverse;
 };
 
 struct Buffer {
@@ -16,7 +17,7 @@ struct Buffer {
 
 struct Filter {
     const int SIZE; // Filter size
-    const float *const p_H[3]; // Array of pointers to each filter
+    double *const p_H[3]; // Array of pointers to each filter
     int curr_res_filter;
     int curr_dec_filter;
 };
