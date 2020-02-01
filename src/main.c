@@ -4,6 +4,7 @@
 #include "h/init_600.h"
 #include "io.h"
 #include "fir.h"
+#include "fir_fft.c"
 #include "demodulator.h"
 #include "resample.h"
 #include "get_lr.h"
@@ -30,6 +31,7 @@ int main(int argc, char *argv[]) {
 	/* FIR FILTER */
 	struct Buffer buff_fir_sum = {.SIZE=FILTER_LEN, .values={0}, .offset=0, .wait=0};
 	struct Buffer buff_fir_diff = {.SIZE=FILTER_LEN, .values={0}, .offset=0, .wait=0};
+
 	
 	/* DEMODULATION */
 	const double SUM_OSC[5] = {1.000000,0.809017,0.309017,-0.309017,-0.809017};
@@ -78,11 +80,11 @@ int main(int argc, char *argv[]) {
 	while (exit == 0) {
 		// Read n=SIZE_READ samples from FILE_IN
 		// Return a pointer to the first element in the batch and the batch size
-		// begin = clock();
-		// float batch[SIZE_READ] = {0};
-		// read_batch(fd, SIZE_READ, batch, &exit);
-		// end = clock();
-		// t_read += (double)(end-begin) / CLOCKS_PER_SEC;
+		begin = clock();
+		float batch[SIZE_READ] = {0};
+		read_batch(fd, SIZE_READ, batch, &exit);
+		end = clock();
+		t_read += (double)(end-begin) / CLOCKS_PER_SEC;
 
 		// Use FIR filter to split the batch into sum and diff
 		// Return a pointer to the first element in the sum and diff array
