@@ -1,18 +1,19 @@
 #include <stdio.h>
 #include<stdbool.h>
 #include "structs.h"
-#include "h/init.h"
+#include "h/init_600.h"
 #include "io.h"
 #include "fir.h"
 #include "demodulator.h"
 #include "resample.h"
 #include "get_lr.h"
 #include "test/csv.h"
+#include<time.h>
 
-#define SIZE_READ 208125
-#define SIZE_FIR 1500
+#define SIZE_READ 625
+#define SIZE_FIR 600
 #define SIZE_RES 500 
-#define SIZE_WRITE 999
+#define SIZE_WRITE 3
 
 int main(int argc, char *argv[]) {
 	/****************************************************************************
@@ -73,25 +74,44 @@ int main(int argc, char *argv[]) {
 	FILE *fd = fopen(p_FILE_IN, "rb");
 	const char *p_FILE_SUM = "src/test/demod_sum.dat";
 	const char *p_FILE_DIFF = "src/test/demod_diff.dat";
+	double t_read;
+	double t_fir;
+	double t_demod;
+	double t_write;
+	clock_t begin;
+	clock_t end;
 	while (exit == 0) {
 		// Read n=SIZE_READ samples from FILE_IN
 		// Return a pointer to the first element in the batch and the batch size
-		float batch[SIZE_READ] = {0};
-		read_batch(fd, SIZE_READ, batch, &exit);
+		// begin = clock();
+		// float batch[SIZE_READ] = {0};
+		// read_batch(fd, SIZE_READ, batch, &exit);
+		// end = clock();
+		// t_read += (double)(end-begin) / CLOCKS_PER_SEC;
 
 		// Use FIR filter to split the batch into sum and diff
 		// Return a pointer to the first element in the sum and diff array
+		begin = clock();
 		double sum[SIZE_READ] = {0};
 		double diff[SIZE_READ] = {0};
-		fir(batch, sum, SIZE_READ, H_SUM, &buff_fir_sum);
-		fir(batch, diff, SIZE_READ, H_DIFF, &buff_fir_diff);
+		fir(fd, sum, SIZE_READ, 0, &buff_fir_sum);
+		fir(fd, diff, SIZE_READ, 1, &buff_fir_diff);
+		end = clock();
+		t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
 	
 		// Demodulate sum and diff
 		// printf("Entering demodulator...\n");
+		begin = clock();
 		demod(sum, SIZE_READ, &sum_osc);
 		demod(diff, SIZE_READ, &diff_osc);
-		write_batch(p_FILE_SUM, SIZE_READ, sum);
-		write_batch(p_FILE_DIFF, SIZE_READ, diff);
+		end = clock();
+		t_demod += (double)(end-begin) / CLOCKS_PER_SEC;
+		
+//		begin = clock();
+//		write_batch(p_FILE_SUM, SIZE_READ, sum);
+//		write_batch(p_FILE_DIFF, SIZE_READ, diff);
+//		end = clock();
+//		t_write += (double)(end-begin) / CLOCKS_PER_SEC;
 		
 		/*
 		// Resample sum and diff
@@ -121,6 +141,7 @@ int main(int argc, char *argv[]) {
 //		printf("Batch %d complete\n************************************************************************************************************\n", counter++);
 	}
 	fclose(fd);
+	printf("Read: %f, FIR: %f, Demod: %f\n", t_read, t_fir, t_demod);
 	printf("FIN.");
 	return 0;
 }

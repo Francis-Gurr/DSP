@@ -10,7 +10,7 @@ struct Demod {
 
 struct Buffer {
     const int SIZE;
-    float values[1500];
+    float values[600];
     int offset;
     int wait;
 };
