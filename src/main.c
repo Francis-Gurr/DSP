@@ -11,7 +11,6 @@
 #include<time.h>
 
 #define SIZE_READ 625
-#define SIZE_FIR 600
 #define SIZE_RES 500 
 #define SIZE_WRITE 3
 
@@ -29,12 +28,8 @@ int main(int argc, char *argv[]) {
 	printf("Arguments read!\n");
 	
 	/* FIR FILTER */
-	double H_SUM[SIZE_FIR] = {0};
-	double H_DIFF[SIZE_FIR] = {0};
-	get_H_SUM(H_SUM);
-	get_H_DIFF(H_DIFF);
-	struct Buffer buff_fir_sum = {.SIZE=SIZE_FIR, .values={0}, .offset=0, .wait=0};
-	struct Buffer buff_fir_diff = {.SIZE=SIZE_FIR, .values={0}, .offset=0, .wait=0};
+	struct Buffer buff_fir_sum = {.SIZE=FILTER_LEN, .values={0}, .offset=0, .wait=0};
+	struct Buffer buff_fir_diff = {.SIZE=FILTER_LEN, .values={0}, .offset=0, .wait=0};
 	
 	/* DEMODULATION */
 	const double SUM_OSC[5] = {1.000000,0.809017,0.309017,-0.309017,-0.809017};
