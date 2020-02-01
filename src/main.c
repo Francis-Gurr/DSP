@@ -28,10 +28,6 @@ int main(int argc, char *argv[]) {
 	printf("Arguments read!\n");
 	
 	/* FIR FILTER */
-	const float *H_SUM;
-	const float H_DIFF[SIZE_FIR] = {0};
-//	H_SUM = get_H_SUM();
-	get_H_DIFF(H_DIFF);
 	for (int i = 0; i< SIZE_FIR; i++) {
 		printf("%f\n", *(H_DIFF+i));
 	}
@@ -55,10 +51,6 @@ int main(int argc, char *argv[]) {
 	struct Demod diff_osc = {.SIZE=100, .p_OSC=DIFF_OSC, .index=0, .inverse=0};	
 
 	/* RESAMPLE */
-	const float H0[SIZE_RES] = {0};
-	const float H1[SIZE_RES] = {0};
-	const float H2[SIZE_RES] = {0};
-	get_H_RES(H0, H1, H2);
 	struct Filter filter = {
 		.SIZE = SIZE_RES,
 		.p_H = {H0,H1,H2},

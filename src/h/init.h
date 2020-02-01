@@ -1,3 +1,5 @@
-const float * get_H_SUM();
-void get_H_DIFF(const float **p_H_DIFF);
-void get_H_RES(const float *p_H0, const float *p_H1, const float *p_H2);
+#define FILTER_LEN (1500)
+const float H_SUM[H_SUM_LEN];
+const float H_DIFF[FILTER_LEN];
+// etc.
+
