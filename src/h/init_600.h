@@ -1,1 +1,3 @@
-void get_H_SUM(double *p_H_SUM);void get_H_DIFF(double *p_H_DIFF);void get_H_RES(double *p_H0, double *p_H1, double *p_H2);
+#define FILTER_LEN (600)
+
+const double H[600][600];
