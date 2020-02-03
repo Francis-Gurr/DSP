@@ -39,6 +39,13 @@ win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
 H_RES  = fir1(N, Fc/(Fs/2), 'low', win, flag);
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% OSC
+for i = 0:199
+	OSC[i] = cos((i/100)*pi);
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CREATE init.c FILE
 M = 173;
@@ -50,11 +57,11 @@ H_DIFF = fft(H_DIFF, N);
 fileID = fopen('init.c','w');
 
 % void get_H_SUM(double *p_H_SUM)
-fprintf(fileID,'\tconst double H[%d][%d][2] = {{\n\t\t', N, N);
+fprintf(fileID,'const double H[2][%d][2] = {{\n\t', N);
 for i = 1:N-1
     fprintf(fileID,'{%.15f, %.15f},', real(H_SUM(i)), imag(H_SUM(i)));
     if mod(i,15)==0
-        fprintf(fileID,'\n\t\t');
+        fprintf(fileID,'\n\t');
     end
 end
 fprintf(fileID,'{%.15f, %.15f}},\n\t\t{', real(H_SUM(N)), imag(H_SUM(N)));
@@ -63,10 +70,11 @@ fprintf(fileID,'{%.15f, %.15f}},\n\t\t{', real(H_SUM(N)), imag(H_SUM(N)));
 for i = 1:N-1
     fprintf(fileID,'{%.15f, %.15f},', real(H_DIFF(i)), imag(H_DIFF(i)));
     if mod(i,15)==0
-        fprintf(fileID,'\n\t\t');
+        fprintf(fileID,'\n\t');
     end
 end
 fprintf(fileID,'{%.15f, %.15f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
+
 
 %  void get_H_RES(double *p_H0, double *p_H1, double *p_H2)
 % N = N/3;
@@ -97,12 +105,26 @@ fprintf(fileID,'{%.15f, %.15f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
 %     fprintf(fileID, '\t*(p_H0 + %d) = %.15f;\n', i-1, H2(i));
 % end
 % fprintf(fileID,'}');
+
+% % OSC
+fprintf(fileID,'const double OSC[200] = {');
+for i = 1:200
+    fprintf(fileID,'%.15f,', OSC[i]);
+    if mod(i,20)==0
+        fprintf(fileID,'\n\t');
+    end
+end
+fprintf(fileID,'}', real(H_DIFF(i)), imag(H_DIFF(i)));
+
 fclose(fileID);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CREATE init.h FILE
 fileID = fopen('init.h','w');
+fprintf(fileID,'#ifndef _CONSTS\n');
+fprintf(fileID,'#define _CONSTS\n');
 fprintf(fileID,'#define FILTER_LEN (%d)\n', N);
 fprintf(fileID, '\nconst double H[%d][%d[2]];', N, N);
+fprintf(fileID,'#endif\n');
 
 fclose(fileID);

@@ -1,3 +1,5 @@
-#define FILTER_LEN (2048)
+#ifndef _FILTERS
+#define _FILTERS
 
-const double H[2048][2048[2]];
+const double H[2][2048][2];
+#endif

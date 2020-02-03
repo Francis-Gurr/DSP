@@ -1,5 +1,5 @@
 # define the name of your source file(s)
-SRCS = ./src/main.c ./src/demodulator.c ./src/resample.c ./src/fir.c /src/fir_fft.c ./src/io.c ./src/get_lr.c ./src/h/init.c ./src/test/csv.c 
+SRCS = ./src/main.c ./src/fir_fft.c ./src/io.c ./src/get_lr.c ./src/h/init.c
 
 # define the name of the object files(s) - we can do this automatically
 OBJS = $(SRCS:.c=.o)
@@ -8,10 +8,10 @@ OBJS = $(SRCS:.c=.o)
 CCOMP = gcc
 
 # flags for the compiler
-CFLAGS = -Wall -fopenmp -O3 -fstrict-aliasing
+CFLAGS = -Wall -lfftw3 -lm -O2 -fstrict-aliasing
 
 # flags for the linker - note -lm for the math library
-LDFLAGS = -O3 -fopenmp -L/usr/lib -lfftw3 -lm
+LDFLAGS = -O2 -L/usr/lib -lfftw3 -lm
 
 # the name of your executable file (the target) - here we put it in the top directory
 TARGET = main

@@ -2,10 +2,8 @@
 #define _STRUCTS
 #include<stdbool.h>
 struct Demod {
-	const int SIZE;
 	const double *p_OSC;
-	int index;
-	bool inverse;
+	int index[2];
 };
 
 struct Buffer {
