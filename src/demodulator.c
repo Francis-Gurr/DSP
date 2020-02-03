@@ -1,59 +1,38 @@
 #include "demodulator.h"
-#include "structs.h"
+#include "h/init.h"
 #include<stdlib.h>
 #include<stdbool.h>
 #include<math.h>
 
-void demod_coherent(double *p_in, int *phase, int sum_or_diff){
-
-	int phase_update = PHASE_INC[sum_or_diff];
-	double I;
-
-	double sample = *p_in;
-	double cos_val = OSC[*phase];
+void demod_coherent(double *p_in, int *phase, int inc){
 
 	// calculate output
-	I = sample * cos_val;
-	*p_in = I;
+	*p_in = *p_in * OSC[*phase];
 
 	// update phase value
-	// phase is really phase * 100 / pi - assumes 200 values in osc
-	if ((*phase += phase_update) >= OSC_SIZE) {
-		*phase -= OSC_SIZE;
-	}
+	*phase = (*phase + inc) % OSC_SIZE;
 }
 
-void demod_costas(double *p_in, int *phase, int sum_or_diff) {
+void demod_costas(double *p_in, int *phase, int inc) {
 
 	// initialise values
 	int phase_update = 0;
-	double I, Q, IQ, lpf_out;
+	double Q, lpf_out;
 
-	double sample = *p_in;
+	int sin_phase = (*phase + SIN_PHASE) % OSC_SIZE;
 
 	// calculate output to NCO
 	double cos_val = OSC[*phase];
-	double sin_val;
-	if (*phase + SIN_PHASE < OSC_SIZE) {
-		sin_val = OSC[*phase + SIN_PHASE];
-	}
-	else {
-		sin_val = OSC[*phase + SIN_PHASE - OSC_SIZE];
-	}
+	double sin_val = OSC[sin_phase];
 
 	// calculate outputs
-	I = sample * cos_val;
-	Q = sample * sin_val;
-	*p_in = I;
-	IQ = I * Q;
+	Q = *p_in * sin_val;
+	*p_in = *p_in * cos_val; // I
 
 	//LPF
-	lpf_out = IQ;
+	lpf_out = *p_in * Q; //IQ
 
 	//update phase value
 	phase_update = floor(lpf_out * PHASE_SCALE);
-	if ((*phase += phase_update) >= OSC_SIZE) {
-		*phase -= OSC_SIZE;
-	}
-
+	*phase = (*phase + phase_update) % OSC_SIZE;
 }

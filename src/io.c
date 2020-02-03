@@ -3,24 +3,22 @@
 #include<fcntl.h>
 #include<stdlib.h>
 
+#define L2 3750
+#define L 1875
+
 void read_batch(FILE *fd, float *p_batch, int *p_exit) {
-
-	int sz = fread(p_batch, 4, L, fd);
-
-	/* PADD final batch*/
-	if (sz != L) {
-		printf("Didn't read an entire batch\n");
+	double batch_double[L2] = {0};
+	int sz = fread(batch_double, 4, L2, fd);
+	if (sz < L2) {
 		*p_exit = 1;
-		for (int i = sz; i < SIZE; i++){
-			*(p_batch+i) = 0.0;
-		}
-
+	}
+	for (int i = 0; i < L; i++) {
+		p_batch[i] = batch_double[i*2];
 	}
 }
 
 void check_zeros(float *p_batch, FILE *fd, int *p_all_zeros) {
 	int i_old;
-	int i_new = 0;
 	for (i_old = 0; i_old < L; i_old++) {
 		if (p_batch[i_old] != 0) {	
 			*p_all_zeros = 0;	
@@ -28,12 +26,14 @@ void check_zeros(float *p_batch, FILE *fd, int *p_all_zeros) {
 		}
 	}
 	if (*p_all_zeros == 0) {
-		batch_extra[i_old];
+		float batch_extra[i_old];
 		fread(&batch_extra, 4, i_old, fd);
-		for (int i = 0; i < L-i_old; i++){
+
+		int i;
+		for (i = 0; i < L-i_old; i++){
 			p_batch[i] = p_batch[i_old + i];
 		}
-		for (int i = 0; i < i_old; i++) {
+		for (i = 0; i < i_old; i++) {
 			p_batch[i+i_old] = batch_extra[i];
 		}
 	}

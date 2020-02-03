@@ -3,25 +3,80 @@
 #include "structs.h"
 #include "io.h"
 #include "fir_fft.h"
-//#include "demodulator.h"
+#include "demodulator.h"
 #include "get_lr.h"
 #include<time.h>
 
 #define SIZE_RES 500 
 #define SIZE_WRITE 3
 
+/* TIMINGS */
+double t_total = 0;
+double t_zeros = 0;
+double t_first_batch = 0;
+double t_other_batches = 0;
+double t_fir = 0;
+double t_demod[2] = {0};
+double t_write = 0;
+clock_t begin;
+clock_t end;
+clock_t start;
+clock_t finish;
 
 /* FIR FILTER */
 double buff_fir_sum[M-1] = {0};
 double buff_fir_diff[M-1] = {0};
 
 /* DEMODULATOR */
-typedef demod(double *p_in, int *phase, int sum_or_diff);
-demod = demod_costas;
+void (*demodulators[2])(double *, int *, int) = {demod_costas, demod_coherent};
 int phase[2] = {0};
+
+/*** PROCESS BATCH ***/
+void process_batch(float *p_batch_in, double *p_batch_left, double *p_batch_right, int demod_type) {
+	
+
+	/* FIR */
+	begin = clock();
+	double sum[N] = {0};
+	double diff[N] = {0};
+	fir_fft(p_batch_in, sum, 0, buff_fir_sum);
+	fir_fft(p_batch_in, diff, 1, buff_fir_diff);
+	end = clock();
+	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
+
+	double *p_sum = sum;
+	double *p_diff = diff;
+	/* LOOP THROUGH BATCH */
+	for (int i = 0; i < L; i++) {
+		/* DEMODULATE */
+		begin = clock();
+		(*demodulators[demod_type])(p_sum, phase, 20);
+		(*demodulators[demod_type])(p_diff, phase+1, 21);
+		end = clock();
+		t_demod[demod_type] += (double)(end-begin) / CLOCKS_PER_SEC;
+
+		/* RESAMPLE */
+/*		float sum_res[SIZE_READ] = {0};
+		float diff_res[SIZE_READ] = {0};
+		batch_size_res = resample(sum, batch_size, sum_res, &filter, &buff_res, &buff_dec);
+		batch_size_res = resample(diff, batch_size, diff_res, &filter, &buff_res, &buff_dec);
+*/
+		/* GET LEFT AND RIGHT */
+/*		float left[SIZE_WRITE] = {0};
+		float right[SIZE_WRITE];
+		get_lr(sum_res, diff_res, left, right, batch_size_res);
+*/
+		p_batch_left[i] = *p_sum;
+		p_batch_right[i] = *p_diff;
+		p_sum++;
+		p_diff++;
+	}
+}
+
 
 /***** MAIN *****/
 int main(int argc, char *argv[]) {
+	start = clock();
 
 	/* FILE PATHS */
 	const char *p_FILE_IN = argv[1];
@@ -42,91 +97,57 @@ int main(int argc, char *argv[]) {
 
 	FILE *fd = fopen(p_FILE_IN, "rb");
 	float batch_in[L];
-	float batch_right[L];
-	float batch_left[L];
+	double batch_left[L];
+	double batch_right[L];
 
 	/* FIND FIRST NON-ZERO BATCH */
+	begin = clock();
 	int all_zeros = 1;
-	while (all_zeros == 0) {
+	int exit = 0;
+	int zero_batches = 0;
+	while (all_zeros == 1) {
 		// Read
-		read_batch(fd, L, batch_in, &exit);
+		zero_batches++;
+		read_batch(fd, batch_in, &exit);
 
 		// Check for non-zeros
 		check_zeros(batch_in, fd, &all_zeros);
 	}
+	end = clock();
+	t_zeros = (double)((end-begin) / CLOCKS_PER_SEC) / zero_batches;
 
 	/* FIRST BATCH */
-	process_batch(batch_in, batch_out);
+	begin = clock();
+	process_batch(batch_in, batch_left, batch_right, 0);
+	end = clock();
+	t_first_batch = (double)(end-begin) / CLOCKS_PER_SEC;
 	// Write
 	write_batch(p_FILE_LEFT, L, batch_left);
 	write_batch(p_FILE_RIGHT, L, batch_right);
-	free(batch_in);
-	free(batch_left);
-	free(batch_right);
 
-	// Change demodulator
-	demod = demod_coherent;
-
-	int exit = 0;
+	int other_batches = 0;
 	while (exit == 0) {
 		// Read
-		read_batch(fd, L, batch_in, &exit);
-
-		process_batch(batch_in, batch_left, batch_right);
+		read_batch(fd, batch_in, &exit);
+		
+		begin = clock();
+		process_batch(batch_in, batch_left, batch_right, 1);
+		end = clock();
+		t_other_batches += (double)(end-begin) / CLOCKS_PER_SEC;
+		other_batches++;
 
 		// Write
 		write_batch(p_FILE_LEFT, L, batch_left);
 		write_batch(p_FILE_RIGHT, L, batch_right);
-		free(batch_in);
-		free(batch_left);
 	}
 
+	t_other_batches = t_other_batches/other_batches;
 	fclose(fd);
-	printf("Read: %f, FIR: %f, Demod: %f\n", t_read, t_fir, t_demod);
+
+	finish = clock();
+	t_total = (double)(finish-start) / CLOCKS_PER_SEC;
+	printf("Total: %f, Zeros: %f, FIR: %f, First Batch: %f\n, Other batches: %f\n", t_total, t_zeros, t_fir, t_first_batch, t_other_batches);
+	printf("Costas: %f, Coherent: %f", t_demod[0], t_demod[1]/other_batches);
 	printf("FIN.");
 	return 0;
-}
-
-void process_batch(p_batch_in, p_batch_left, p_batch_right) {
-	
-	/* TIMINGS */
-	double t_read;
-	double t_fir;
-	double t_demod;
-	double t_write;
-	clock_t begin;
-	clock_t end;
-
-	/* FIR */
-	begin = clock();
-	double sum[N] = {0};
-	double diff[N] = {0};
-	fir_fft(p_batch_in, sum, 0, buff_fir_sum);
-	fir_fft(p_batch_in, diff, 1, buff_fir_diff);
-	end = clock();
-	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
-
-	/* LOOP THROUGH BATCH */
-	for (i = 0; i < L; i++) {
-		/* DEMODULATE */
-		begin = clock();
-		demod(p_sum, L, &sum_osc);
-		demod(p_diff, L, &diff_osc);
-		end = clock();
-		t_demod += (double)(end-begin) / CLOCKS_PER_SEC;
-
-		/* RESAMPLE */
-/*		float sum_res[SIZE_READ] = {0};
-		float diff_res[SIZE_READ] = {0};
-		batch_size_res = resample(sum, batch_size, sum_res, &filter, &buff_res, &buff_dec);
-		batch_size_res = resample(diff, batch_size, diff_res, &filter, &buff_res, &buff_dec);
-		float left[SIZE_WRITE] = {0};
-		float right[SIZE_WRITE];
-		get_lr(sum_res, diff_res, left, right, batch_size_res);
-*/
-		p_batch_left[i] = *sum;
-		p_batch_right[i] = *diff;
-		sum++;
-		diff++;
-	}
 }
