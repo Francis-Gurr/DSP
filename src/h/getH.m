@@ -42,8 +42,8 @@ H_RES  = fir1(N, Fc/(Fs/2), 'low', win, flag);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% OSC
-for i = 0:199
-	OSC[i] = cos((i/100)*pi);
+for i = 1:200
+	OSC(i) = cos(((i-1)/100)*pi);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,13 +108,13 @@ fprintf(fileID,'{%.15f, %.15f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
 
 % % OSC
 fprintf(fileID,'const double OSC[200] = {');
-for i = 1:200
-    fprintf(fileID,'%.15f,', OSC[i]);
+for i = 1:199
+    fprintf(fileID,'%.15f,', OSC(i));
     if mod(i,20)==0
         fprintf(fileID,'\n\t');
     end
 end
-fprintf(fileID,'}', real(H_DIFF(i)), imag(H_DIFF(i)));
+fprintf(fileID,'%.15f}', OSC(200));
 
 fclose(fileID);
 
@@ -124,7 +124,8 @@ fileID = fopen('init.h','w');
 fprintf(fileID,'#ifndef _CONSTS\n');
 fprintf(fileID,'#define _CONSTS\n');
 fprintf(fileID,'#define FILTER_LEN (%d)\n', N);
-fprintf(fileID, '\nconst double H[%d][%d[2]];', N, N);
-fprintf(fileID,'#endif\n');
+fprintf(fileID, '\nconst double H[2][%d][2];\n', N);
+fprintf(fileID, '\nconst double OSC[200];\n');
+fprintf(fileID,'\n#endif\n');
 
 fclose(fileID);
