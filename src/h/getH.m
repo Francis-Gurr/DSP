@@ -109,12 +109,12 @@ fprintf(fileID,'{%.10f, %.10f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
 % % OSC
 fprintf(fileID,'const double OSC[200] = {');
 for i = 1:199
-    fprintf(fileID,'%.10f,', OSC(i));
+    fprintf(fileID,'%.6f,', OSC(i));
     if mod(i,20)==0
         fprintf(fileID,'\n\t');
     end
 end
-fprintf(fileID,'%.10f};', OSC(200));
+fprintf(fileID,'%.6f};', OSC(200));
 
 fclose(fileID);
 
