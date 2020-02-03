@@ -7,7 +7,7 @@
 #define L 1875
 
 void read_batch(FILE *fd, float *p_batch, int *p_exit) {
-	double batch_double[L2] = {0};
+	float batch_double[L2] = {0};
 	int sz = fread(batch_double, 4, L2, fd);
 	if (sz < L2) {
 		*p_exit = 1;

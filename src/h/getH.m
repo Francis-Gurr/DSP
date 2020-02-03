@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% SUM FILTER
 % All frequency values are in MHz.
-Fs = 10;  % Sampling Frequency
+Fs = 5;  % Sampling Frequency
 N    = 172;     % Order
 Fc1  = 0.98;     % First Cutoff Frequency
 Fc2  = 1.02;     % Second Cutoff Frequency
@@ -15,7 +15,7 @@ H_SUM  = fir1(N, [Fc1 Fc2]/(Fs/2), 'bandpass', win, flag);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DIFF FILTER
 % All frequency values are in MHz.
-Fs = 10;  % Sampling Frequency
+Fs = 5;  % Sampling Frequency
 N    = 172;     % Order
 Fc1  = 1.03;     % First Cutoff Frequency
 Fc2  = 1.07;     % Second Cutoff Frequency
@@ -59,21 +59,21 @@ fileID = fopen('init.c','w');
 % void get_H_SUM(double *p_H_SUM)
 fprintf(fileID,'const double H[2][%d][2] = {{\n\t', N);
 for i = 1:N-1
-    fprintf(fileID,'{%.15f, %.15f},', real(H_SUM(i)), imag(H_SUM(i)));
+    fprintf(fileID,'{%.10f, %.10f},', real(H_SUM(i)), imag(H_SUM(i)));
     if mod(i,15)==0
         fprintf(fileID,'\n\t');
     end
 end
-fprintf(fileID,'{%.15f, %.15f}},\n\t\t{', real(H_SUM(N)), imag(H_SUM(N)));
+fprintf(fileID,'{%.10f, %.10f}},\n\t\t{', real(H_SUM(N)), imag(H_SUM(N)));
 
 % void get_H_DIFF(double *p_H_DIFF)
 for i = 1:N-1
-    fprintf(fileID,'{%.15f, %.15f},', real(H_DIFF(i)), imag(H_DIFF(i)));
+    fprintf(fileID,'{%.10f, %.10f},', real(H_DIFF(i)), imag(H_DIFF(i)));
     if mod(i,15)==0
         fprintf(fileID,'\n\t');
     end
 end
-fprintf(fileID,'{%.15f, %.15f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
+fprintf(fileID,'{%.10f, %.10f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
 
 
 %  void get_H_RES(double *p_H0, double *p_H1, double *p_H2)
@@ -109,12 +109,12 @@ fprintf(fileID,'{%.15f, %.15f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
 % % OSC
 fprintf(fileID,'const double OSC[200] = {');
 for i = 1:199
-    fprintf(fileID,'%.15f,', OSC(i));
+    fprintf(fileID,'%.10f,', OSC(i));
     if mod(i,20)==0
         fprintf(fileID,'\n\t');
     end
 end
-fprintf(fileID,'%.15f}', OSC(200));
+fprintf(fileID,'%.10f};', OSC(200));
 
 fclose(fileID);
 
