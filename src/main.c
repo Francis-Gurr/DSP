@@ -28,7 +28,7 @@ double buff_fir_sum[M-1] = {0};
 double buff_fir_diff[M-1] = {0};
 
 /* DEMODULATOR */
-//void (*demodulators[2])(double *,double *, int *) = {demod_costas, demod_coherent};
+//void (*demodulators[2])(double *, double *, int *) = {demod_costas, demod_coherent};
 int phase[2] = {0};
 
 /*** PROCESS BATCH ***/
@@ -43,10 +43,15 @@ void process_batch(float *p_batch_in, double *sum, double *diff, int demod_type)
 	fir_fft(p_batch_in, diff, 1, buff_fir_diff);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
+
+	/* DEMODULATE */
+	if (demod_type ==  1) {
 	begin = clock();
 	demod_coherent(sum, diff, phase);
 	end = clock();
 	t_demod[demod_type] += (double)(end-begin) / CLOCKS_PER_SEC;
+	}
+	
 	/* LOOP THROUGH BATCH */
 //	for (int i = 0; i < L; i++) {
 //		/* DEMODULATE */
