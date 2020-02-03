@@ -15,42 +15,33 @@ float fir1(const float *p_H, struct Buffer *buff) {
   float sum = 0.0;
   int i;
   for (i = buff->offset; i > 0; i--) {
-    sum += buff->values[i] * *(p_H+i);
+    sum += buff->values[i] * p_H[i];
   }
   for (i = buff->SIZE; i > buff->offset; i--) {
-    sum += buff->values[i] * *(p_H+i);
+    sum += buff->values[i] * p_H[i];
   }
   return sum;
 }
 
-int resample(float *p_batch, int batch_size, float *p_res, struct Filter *p_filter, struct Buffer *p_buff) {
-	int batch_size_res = batch_size * 0.0048;
-	float *resampled = p_res;
-	// For each sample in the batch
-	for (int i = batch_size; i--; ) {
-		float sample = *(p_batch+i); // Sample is the current value from the array
-		int curr_res_filter = p_filter->curr_res_filter;
+int resample(double *p_in, double *p_out, int *curr_res_filter, struct Buffer *p_buff) {
 
-		// Add the sample to the resampling buffer
-		add_to_buffer(sample, p_buff);
+	// Add the sample to the resampling buffer
+	add_to_buffer(sample, p_buff);
+	
+	// If the buffer is ready, resample
+	if (p_buff->wait == 0) {
+		// Resample by a factor of 6/625
+		*p_out = fir1(p_H[*curr_res_filter], p_buff);
 		
-		// If the buffer is ready, resample
-		if (p_buff->wait == 0) {
-			// Resample by a factor of 3/625
-			 *resampled = fir1(p_filter->p_H[curr_res_filter], p_buff);
-			
-			// Increase the curr_filter and buffer wait values
-			if (++curr_res_filter > 2) {
-				curr_res_filter = 0;
-			}
-			if (curr_res_filter == 2) {
-				p_buff->wait = 209;
-			}
-			else {
-				p_buff->wait = 208;
-			}
-			resampled++;
-		}	
-	}
-	return batch_size_res;
+		// Increase the curr_filter and buffer wait values
+		if (++curr_res_filter > 6) {
+			curr_res_filter = 0;
+		}
+		if (curr_res_filter == 6) {
+			p_buff->wait = 105;
+		}
+		else {
+			p_buff->wait = 104;
+		}
+	}	
 }

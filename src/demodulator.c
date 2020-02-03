@@ -4,13 +4,27 @@
 #include<stdbool.h>
 #include<math.h>
 
-void demod_coherent(double *p_in, int *phase, int inc){
-
-	// calculate output
-	*p_in = *p_in * OSC[*phase];
-
-	// update phase value
-	*phase = (*phase + inc) % OSC_SIZE;
+void demod_coherent(double *p_sum, double *p_diff, int *p_phase){
+	int sum_phase;
+	int diff_phase;	
+	for (int i = 0; i < 1875; i++) {
+		// Sum
+		sum_phase = p_phase[0];
+		p_sum[i] = p_sum[i] * OSC[sum_phase];
+		sum_phase = (sum_phase + 20);
+		if (sum_phase >= OSC_SIZE) {
+			sum_phase -= OSC_SIZE;
+		}
+		// diff
+		diff_phase = p_phase[1];
+		p_diff[i] = p_diff[i] * OSC[diff_phase];
+		diff_phase = (diff_phase + 21);
+		if (diff_phase >= OSC_SIZE) {
+			diff_phase -= OSC_SIZE;
+		}
+	}
+	p_phase[0] = sum_phase;
+	p_phase[1] = diff_phase;
 }
 
 void demod_costas(double *p_in, int *phase, int inc) {
@@ -34,5 +48,5 @@ void demod_costas(double *p_in, int *phase, int inc) {
 
 	//update phase value
 	phase_update = floor(lpf_out * PHASE_SCALE);
-	*phase = (*phase + phase_update) % OSC_SIZE;
+	*phase = (*phase + inc + phase_update) % OSC_SIZE;
 }

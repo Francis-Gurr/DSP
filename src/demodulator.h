@@ -12,6 +12,6 @@
 
 #endif
 
-void  demod_coherent(double *p_in,  int *phase, int sum_or_diff);
+void  demod_coherent(double *sum, double *diff,  int *p_phase);
 
 void demod_costas(double *p_in, int *phase, int sum_or_diff);
