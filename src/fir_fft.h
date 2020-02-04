@@ -6,4 +6,4 @@
 #define M 173
 #define N 2048
 
-void fir_fft(float *p_in, double *p_out, int filter_id, double *p_buf);
+void fir_fft(double *p_sum, double *p_diff, double *p_buf_sum, double *p_buf_diff);

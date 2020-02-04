@@ -28,53 +28,29 @@ double buff_fir_sum[M-1] = {0};
 double buff_fir_diff[M-1] = {0};
 
 /* DEMODULATOR */
-//void (*demodulators[2])(double *, double *, int *) = {demod_costas, demod_coherent};
+void (*demodulators[2])(float *, double *, double *, int *) = {demod_costas, demod_coherent};
 int phase[2] = {0};
 
 /*** PROCESS BATCH ***/
 void process_batch(float *p_batch_in, double *sum, double *diff, int demod_type) {
 	
+	/* DEMODULATE */
+	begin = clock();
+
+	(*demodulators[demod_type])(p_batch_in, sum, diff, phase);
+	end = clock();
+	t_demod[demod_type] += (double)(end-begin) / CLOCKS_PER_SEC;
 
 	/* FIR */
 	begin = clock();
 	//double sum[N] = {0};
 	//double diff[N] = {0};
-	fir_fft(p_batch_in, sum, 0, buff_fir_sum);
-	fir_fft(p_batch_in, diff, 1, buff_fir_diff);
+	fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
-
-	/* DEMODULATE */
-	if (demod_type ==  1) {
-	begin = clock();
-	demod_coherent(sum, diff, phase);
-	end = clock();
-	t_demod[demod_type] += (double)(end-begin) / CLOCKS_PER_SEC;
-	}
 	
 	/* LOOP THROUGH BATCH */
 //	for (int i = 0; i < L; i++) {
-//		/* DEMODULATE */
-//		if(demod_type == 1) {
-//		begin = clock();
-//		//coherent
-		
-		// calculate output
-//		*p_sum = *p_sum * OSC[phase[0]];
-//		*p_diff = *p_diff * OSC[phase[1]];
-	
-		// update phase value
-//		phase[0] = (phase[0] + 20) % 200;
-//		phase[1] = (phase[1] + 21) % 200;
-//		end = clock();
-//		t_demod[1] += (double)(end-begin) / CLOCKS_PER_SEC;
-//		}
-//		else {
-//			demod_costas(p_sum, phase, 20);
-//			demod_costas(p_diff, phase+1, 21);
-//		}
-		//(*demodulators[demod_type])(p_sum, phase, 20);
-		//(*demodulators[demod_type])(p_diff, phase+1, 21);
 
 		/* RESAMPLE */
 /*		float sum_res[SIZE_READ] = {0};
