@@ -162,14 +162,14 @@ end
 % H_LOW = H_LOW_S;
 % 
 % % LOW PASS - MEDIUM 
-% M = 347;
-% N = 4096;
-% H_LOW = H_LOW_M;
+M = 347;
+N = 4096;
+H_LOW = H_LOW_M;
 
 % LOW PASS - LARGE
-M = 693;
-N = 8192;
-H_LOW = H_LOW_L;
+% M = 693;
+% N = 8192;
+% H_LOW = H_LOW_L;
 % 
 % % RESAMPLING - SMALL
 % N_RES = N_RES_S;

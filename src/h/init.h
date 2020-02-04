@@ -1,15 +1,14 @@
 #ifndef _CONSTS
 #define _CONSTS
 
-#define N 8192
-#define L 7500
-#define M 693
+#define N 4096
+#define L 3750
+#define M 347
 #define M_RES 1024
-#define OUT_SIZE 72
 
 const double H_DEMOD[3][10];
 
-const double H_LOW[8192][2];
+const double H_LOW[4096][2];
 
 const double H_RES[6][1024];
 
