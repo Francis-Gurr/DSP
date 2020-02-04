@@ -93,12 +93,12 @@ fileID = fopen('init.c','w');
 % H_LOW
 fprintf(fileID,'const double H_LOW[%d][2] = {', N);
 for i = 1:N-1
-    fprintf(fileID,'{%.10f, %.10f},', real(H_LOW(i)), imag(H_LOW(i)));
+    fprintf(fileID,'{%.15f, %.15f},', real(H_LOW(i)), imag(H_LOW(i)));
     if mod(i,8)==0
         fprintf(fileID,'\n\t\t');
     end
 end
-fprintf(fileID,'{%.10f, %.10f}};\n\n', real(H_LOW(N)), imag(H_LOW(N)));
+fprintf(fileID,'{%.15f, %.15f}};\n\n', real(H_LOW(N)), imag(H_LOW(N)));
 
 
 % H_RES
@@ -106,15 +106,15 @@ fprintf(fileID,'const double H_RES[6][%d] = {', N_RES);
 for i = 1:6
     fprintf(fileID,'{');
     for j = 1:N_RES-1
-        fprintf(fileID,'%.10f, ', H_RES(i, j));
+        fprintf(fileID,'%.15f, ', H_RES(i, j));
         if mod(j,8)==0
             fprintf(fileID,'\n\t\t');
         end
     end
     if i==6
-        fprintf(fileID,'%.10f}};\n\n', H_RES(i, N_RES));
+        fprintf(fileID,'%.15f}};\n\n', H_RES(i, N_RES));
     else
-        fprintf(fileID,'%.10f},\n\t\t', H_RES(i, N_RES));
+        fprintf(fileID,'%.15f},\n\t\t', H_RES(i, N_RES));
     end
 end
 % fprintf(fileID,'void get_H_RES(double *p_H0, double *p_H1, double *p_H2) {\n');
@@ -140,12 +140,12 @@ end
 % % OSC
 fprintf(fileID,'const double OSC[200] = {');
 for i = 1:199
-    fprintf(fileID,'%.6f,', OSC(i));
+    fprintf(fileID,'%.15f,', OSC(i));
     if mod(i,20)==0
         fprintf(fileID,'\n\t');
     end
 end
-fprintf(fileID,'%.6f};', OSC(200));
+fprintf(fileID,'%.15f};', OSC(200));
 
 fclose(fileID);
 
@@ -162,4 +162,3 @@ fprintf(fileID, '\nconst double OSC[200];\n');
 fprintf(fileID,'\n#endif\n');
 
 fclose(fileID);
-
