@@ -4,7 +4,7 @@
 #include "io.h"
 #include "fir_fft.h"
 #include "demodulator.h"
-#include "get_lr.h"
+#include "resample.h"
 #include<time.h>
 
 #define SIZE_RES 500 
@@ -17,11 +17,18 @@ double t_first_batch = 0;
 double t_other_batches = 0;
 double t_fir = 0;
 double t_demod[2] = {0};
+double t_res = 0;
 double t_write = 0;
 clock_t begin;
 clock_t end;
 clock_t start;
 clock_t finish;
+
+double sum[L];
+double diff[L];
+
+double left[18];
+double right[18];
 
 /* FIR FILTER */
 double buff_fir_sum[M-1] = {0};
@@ -31,8 +38,13 @@ double buff_fir_diff[M-1] = {0};
 void (*demodulators[2])(float *, double *, double *, int *) = {demod_costas, demod_coherent};
 int phase[2] = {0};
 
+/* RESAMPLE */
+double buff_res_sum[M_RES] = {0};
+double buff_res_diff[M_RES] = {0};
+struct Buffer buff_params = {.offset=0, .wait=104, .curr_filter=0};
+
 /*** PROCESS BATCH ***/
-void process_batch(float *p_batch_in, double *sum, double *diff, int demod_type) {
+void process_batch(float *p_batch_in, int demod_type) {
 	
 	/* DEMODULATE */
 	begin = clock();
@@ -43,31 +55,15 @@ void process_batch(float *p_batch_in, double *sum, double *diff, int demod_type)
 
 	/* FIR */
 	begin = clock();
-	//double sum[N] = {0};
-	//double diff[N] = {0};
 	fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
-	
-	/* LOOP THROUGH BATCH */
-//	for (int i = 0; i < L; i++) {
 
-		/* RESAMPLE */
-/*		float sum_res[SIZE_READ] = {0};
-		float diff_res[SIZE_READ] = {0};
-		batch_size_res = resample(sum, batch_size, sum_res, &filter, &buff_res, &buff_dec);
-		batch_size_res = resample(diff, batch_size, diff_res, &filter, &buff_res, &buff_dec);
-*/
-		/* GET LEFT AND RIGHT */
-/*		float left[SIZE_WRITE] = {0};
-		float right[SIZE_WRITE];
-		get_lr(sum_res, diff_res, left, right, batch_size_res);
-*/
-//		p_batch_left[i] = *p_sum;
-//		p_batch_right[i] = *p_diff;
-//		p_sum++;
-//		p_diff++;
-//	}
+	/*RESAMPLE */
+	begin = clock();
+	resample(sum, diff, buff_res_sum, buff_res_diff, &buff_params, left, right);
+	end = clock();
+	t_res += (double)(end-begin) / CLOCKS_PER_SEC;
 }
 
 /***** MAIN *****/
@@ -79,22 +75,8 @@ int main(int argc, char *argv[]) {
 	const char *p_FILE_LEFT = argv[2];
 	const char *p_FILE_RIGHT = argv[3];
 	
-
-	/* RESAMPLE 
-	struct Filter filter = {
-		.SIZE = SIZE_RES,
-		.p_H = {H0,H1,H2},
-		.curr_res_filter = 0,
-		.curr_dec_filter = 0
-	};
-	struct Buffer buff_res = {.SIZE=SIZE_RES, .values={0}, .offset=0, .wait=1}; // Resample buffer
-	struct Buffer buff_dec = {.SIZE=SIZE_DEC, .values={0}, .offset=0, .wait=1}; // Decimation buffer
-	*/
-
 	FILE *fd = fopen(p_FILE_IN, "rb");
 	float batch_in[L];
-	double batch_left[L];
-	double batch_right[L];
 
 	/* FIND FIRST NON-ZERO BATCH */
 	begin = clock();
@@ -114,12 +96,12 @@ int main(int argc, char *argv[]) {
 
 	/* FIRST BATCH */
 	begin = clock();
-	process_batch(batch_in, batch_left, batch_right, 0);
+	process_batch(batch_in, 0);
 	end = clock();
 	t_first_batch = (double)(end-begin) / CLOCKS_PER_SEC;
 	// Write
-	write_batch(p_FILE_LEFT, L, batch_left);
-	write_batch(p_FILE_RIGHT, L, batch_right);
+	write_batch(p_FILE_LEFT, 18, left);
+	write_batch(p_FILE_RIGHT, 18, right);
 
 	int other_batches = 0;
 	while (exit == 0) {
@@ -127,14 +109,14 @@ int main(int argc, char *argv[]) {
 		read_batch(fd, batch_in, &exit);
 		
 		begin = clock();
-		process_batch(batch_in, batch_left, batch_right, 1);
+		process_batch(batch_in, 1);
 		end = clock();
 		t_other_batches += (double)(end-begin) / CLOCKS_PER_SEC;
 		other_batches++;
 
 		// Write
-		write_batch(p_FILE_LEFT, L, batch_left);
-		write_batch(p_FILE_RIGHT, L, batch_right);
+		write_batch(p_FILE_LEFT, 18, left);
+		write_batch(p_FILE_RIGHT, 18, right);
 	}
 
 	t_other_batches = t_other_batches/other_batches;
@@ -143,7 +125,7 @@ int main(int argc, char *argv[]) {
 	finish = clock();
 	t_total = (double)(finish-start) / CLOCKS_PER_SEC;
 	printf("Total: %f, Zeros: %f, FIR: %f, First Batch: %f\n, Other batches: %f\n", t_total, t_zeros, t_fir, t_first_batch, t_other_batches);
-	printf("Costas: %f, Coherent: %f", t_demod[0], t_demod[1]);
-	printf("FIN.");
+	printf("Costas: %f, Coherent: %f, Resample: %f\n", t_demod[0], t_demod[1], t_res);
+	printf("\nFIN.\n");
 	return 0;
 }

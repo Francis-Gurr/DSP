@@ -1,7 +1,5 @@
 #include "structs.h"
+#include "h/init.h"
+#include <stdio.h>
 
-void add_to_buffer(float p_elem, struct Buffer *buff);
-
-float fir1(const float *p_H, struct Buffer *buff);
-
-int resample(float *p_in, int *p_out, int *curr_res_filter, struct Buffer *p_buff);
+void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_diff, struct Buffer *p_buff_params, double *p_left, double *p_right); 

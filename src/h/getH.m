@@ -46,7 +46,8 @@ H_LOW = fft(H_LOW, 2048);
 %% RESAMPLING FILTER
 % All frequency values are in MHz.
 Fs = 30;  % Sampling Frequency
-N    = 767;     % Order
+N_RES = 512
+N    = N_RES*6 - 1;     % Order
 Fc  = 0.025;     % First Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 Beta = 4.54;     % Window Parameter
@@ -55,7 +56,7 @@ win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
 H_RES  = fir1(N, Fc/(Fs/2), 'low', win, flag);
 % Split filter
-H_RES = reshape(H_RES,[6,128]);
+H_RES = reshape(H_RES,[6,N_RES]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% OSC
@@ -67,7 +68,6 @@ end
 %% CREATE init.c FILE
 M = 173;
 N = 2048;
-N_RES = 128;
 
 fileID = fopen('init.c','w');
 
