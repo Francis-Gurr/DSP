@@ -157,14 +157,14 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CREATE init.c FILE
 % LOW PASS - SMALL
-% M = 174;
-% N = 2048;
-% H_LOW = H_LOW_S;
+M = 174;
+N = 2048;
+H_LOW = H_LOW_S;
 % 
 % % LOW PASS - MEDIUM 
-M = 347;
-N = 4096;
-H_LOW = H_LOW_M;
+% M = 347;
+% N = 4096;
+% H_LOW = H_LOW_M;
 
 % LOW PASS - LARGE
 % M = 693;
@@ -268,6 +268,8 @@ fprintf(fileID,'#define N %d\n', N);
 fprintf(fileID,'#define L %d\n', N-M+1);
 fprintf(fileID,'#define M %d\n', M);
 fprintf(fileID,'#define M_RES %d\n', N_RES);
+SIZE_OUT = (N - M + 1) * 6/625;
+fprintf(fileID,'#define SIZE_OUT %d\n', SIZE_OUT);
 fprintf(fileID, '\nconst double H_DEMOD[3][%d];\n', N_DEMOD);
 fprintf(fileID, '\nconst double H_LOW[%d][2];\n', N);
 fprintf(fileID, '\nconst double H_RES[6][%d];\n', N_RES);
