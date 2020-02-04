@@ -33,7 +33,7 @@ H_DIFF = fft(H_DIFF, 2048);
 % All frequency values are in MHz.
 Fs = 5;  % Sampling Frequency
 N    = 172;     % Order
-Fc  = 0.025;     % First Cutoff Frequency
+Fc  = 0.025;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
@@ -48,7 +48,7 @@ H_LOW = fft(H_LOW, 2048);
 Fs = 30;  % Sampling Frequency
 N_RES = 512
 N    = N_RES*6 - 1;     % Order
-Fc  = 0.025;     % First Cutoff Frequency
+Fc  = 0.024;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
@@ -153,8 +153,9 @@ fclose(fileID);
 %% CREATE init.h FILE
 fileID = fopen('init.h','w');
 fprintf(fileID,'#ifndef _CONSTS\n');
-fprintf(fileID,'#define _CONSTS\n');
+fprintf(fileID,'#define _CONSTS\n\n');
 fprintf(fileID,'#define FILTER_LEN %d\n', N);
+fprintf(fileID,'#define M_RES %d\n', N_RES);
 fprintf(fileID, '\nconst double H_LOW[%d][2];\n', N);
 fprintf(fileID, '\nconst double H_RES[6][%d];\n', N_RES);
 fprintf(fileID, '\nconst double OSC[200];\n');

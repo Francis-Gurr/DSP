@@ -16,7 +16,7 @@ void fir_fft(double *p_sum, double *p_diff, double *p_buf_sum, double *p_buf_dif
 	// Produce input sample of length N = L + M -1
 	for (int i = 0; i < M-1; i++) {
 	       x_sum[i] = *(p_buf_sum+i);
-	       x_diff[i] = *(p_buf_diff+1);
+	       x_diff[i] = *(p_buf_diff+i);
 	}	       
 	for (int i = 0; i < L; i++) {
 	       x_sum[M-1+i] = *(p_sum+i);
