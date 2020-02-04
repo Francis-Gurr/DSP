@@ -114,7 +114,7 @@ for i = 1:6
     if i==6
         fprintf(fileID,'%.10f}};\n\n', H_RES(i, N_RES));
     else
-        fprintf(fileID,'%.10f}\n\t\t', H_RES(i, N_RES));
+        fprintf(fileID,'%.10f},\n\t\t', H_RES(i, N_RES));
     end
 end
 % fprintf(fileID,'void get_H_RES(double *p_H0, double *p_H1, double *p_H2) {\n');

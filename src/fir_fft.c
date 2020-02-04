@@ -36,10 +36,10 @@ void fir_fft(double *p_sum, double *p_diff, double *p_buf_sum, double *p_buf_dif
 	double mux = 1.0/N;
 
 	for (int i = 0; i < N; i++) {
-		Y_SUM[i][0] = (X_SUM[i][0] * H[i][0] - X_SUM[i][1] * H[i][1]) * mux;
-		Y_SUM[i][1] = (X_SUM[i][0] * H[i][1] + X_SUM[i][1] * H[i][0]) * mux;
-		Y_DIFF[i][0] = (X_DIFF[i][0] * H[i][0] - X_DIFF[i][1] * H[i][1]) * mux;
-		Y_DIFF[i][1] = (X_DIFF[i][0] * H[i][1] + X_DIFF[i][1] * H[i][0]) * mux;
+		Y_SUM[i][0] = (X_SUM[i][0] * H_LOW[i][0] - X_SUM[i][1] * H_LOW[i][1]) * mux;
+		Y_SUM[i][1] = (X_SUM[i][0] * H_LOW[i][1] + X_SUM[i][1] * H_LOW[i][0]) * mux;
+		Y_DIFF[i][0] = (X_DIFF[i][0] * H_LOW[i][0] - X_DIFF[i][1] * H_LOW[i][1]) * mux;
+		Y_DIFF[i][1] = (X_DIFF[i][0] * H_LOW[i][1] + X_DIFF[i][1] * H_LOW[i][0]) * mux;
 	}
 	
 	// IDFT

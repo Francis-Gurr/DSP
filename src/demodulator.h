@@ -1,4 +1,5 @@
 #include "h/init.h"
+#include "fir_fft.h"
 #include<stdlib.h>
 #include<stdbool.h>
 #include<math.h>

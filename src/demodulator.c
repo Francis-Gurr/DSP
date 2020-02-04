@@ -1,15 +1,16 @@
 #include "demodulator.h"
 #include "h/init.h"
+#include "fir_fft.h"
 #include<stdlib.h>
 #include<stdbool.h>
 #include<math.h>
 
-void demod_coherent(float *p_in, double *p_sum, double *p_diff, int *p_phase, int){
-	int sum_phase = p_phase[0];
-	int diff_phase = p_phase[1];	
+void demod_coherent(float *p_in, double *p_sum, double *p_diff, int *p_phase){
+	int sum_phase = *p_phase;
+	int diff_phase = *p_phase+1;	
 	for (int i = 0; i < L; i++) {
 
-		val_in = (double)(p_in[i]);
+		double val_in = (double)(p_in[i]);
 
 		// SUM
 		p_sum[i] = val_in * OSC[sum_phase];
@@ -28,11 +29,10 @@ void demod_coherent(float *p_in, double *p_sum, double *p_diff, int *p_phase, in
 	p_phase[1] = diff_phase;
 }
 
-void demod_costas(float *p_in, double *p_sum, double *p_diff, int *phase) {
-	int sum_phase = p_phase[0];
-	int diff_phase = p_phase[1];	
-	int phase_update = 0;
-	double Q, lpf_out;
+void demod_costas(float *p_in, double *p_sum, double *p_diff, int *p_phase) {
+	int sum_phase = *p_phase;
+	int diff_phase = *p_phase+1;	
+	double I, lpf_out;
 
 	for (int i = 0; i < L; i++) {
 		
@@ -57,7 +57,7 @@ void demod_costas(float *p_in, double *p_sum, double *p_diff, int *phase) {
 
 		// DIFF
 		// Get sin phase
-		int sin_phase = sum_phase + SIN_PHASE;
+		sin_phase = sum_phase + SIN_PHASE;
 		if (sin_phase >= OSC_SIZE) {
 			sin_phase -= OSC_SIZE;
 		}
