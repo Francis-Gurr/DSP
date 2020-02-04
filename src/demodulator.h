@@ -8,7 +8,7 @@
 #define _DEMOD
 
 #define OSC_SIZE 200
-#define SIN_PHASE 50
+#define SIN_PHASE -50
 #define PHASE_SCALE 31.83099
 
 #endif

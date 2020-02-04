@@ -49,7 +49,7 @@ void demod_costas(float *p_in, double *p_sum, double *p_diff, int *p_phase) {
 		p_sum[i] = I;
 		// NCO ouput
 		//lpf_out = val_in * OSC[sin_phase] * I; // Q * I 
-		lpf_out = atan(I/(val_in*OSC[sin_phase]));
+		lpf_out = atan2(OSC[sum_phase],OSC[sin_phase]);
 		// Next phase value
 		sum_phase = sum_phase + (int)(lpf_out * PHASE_SCALE) + 20;
 		if (sum_phase >= OSC_SIZE) {
@@ -67,13 +67,13 @@ void demod_costas(float *p_in, double *p_sum, double *p_diff, int *p_phase) {
 		p_diff[i] = I;
 		// NCO ouput
 		//lpf_out = val_in * OSC[sin_phase] * I; // Q * I 
-		lpf_out = atan(I/(val_in*OSC[sin_phase]));
+		lpf_out = atan2(OSC[diff_phase],OSC[sin_phase]);
 		// Next phase value
 		diff_phase = diff_phase + (int)(lpf_out * PHASE_SCALE) + 21;
 		if (diff_phase >= OSC_SIZE) {
 			diff_phase -= OSC_SIZE;
 		}
 	}
-	p_phase[0] = sum_phase;
-	p_phase[1] = diff_phase;	
+	p_phase[0] = sum_phase+50;
+	p_phase[1] = diff_phase+50;	
 }
