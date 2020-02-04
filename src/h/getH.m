@@ -33,7 +33,7 @@ H_DIFF = fft(H_DIFF, 2048);
 % All frequency values are in MHz.
 Fs = 5;  % Sampling Frequency
 N_DEMOD = 10;     % Order
-Fc  = 1.9;     % Cutoff Frequency
+Fc  = 2.1;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 % Create the window vector for the design algorithm.
 win = kaiser(N_DEMOD+1, Beta);
@@ -45,7 +45,7 @@ H_DEMOD_1  = fir1(N_DEMOD, Fc/(Fs/2), 'low', win, flag);
 % All frequency values are in MHz.
 Fs = 5;  % Sampling Frequency
 N_DEMOD    = 10;     % Order
-Fc  = 2;     % Cutoff Frequency
+Fc  = 2.2;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 % Create the window vector for the design algorithm.
 win = kaiser(N_DEMOD+1, Beta);
