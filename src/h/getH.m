@@ -38,7 +38,7 @@ flag = 'scale';  % Sampling Flag
 % Create the window vector for the design algorithm.
 win = kaiser(N_DEMOD+1, Beta);
 % Calculate the coefficients using the FIR1 function.
-H_LOW_DEMOD_1  = fir1(N_DEMOD, Fc/(Fs/2), 'low', win, flag);
+H_DEMOD_1  = fir1(N_DEMOD, Fc/(Fs/2), 'low', win, flag);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% LOW PASS FILTER - COSTAS 2
@@ -50,7 +50,19 @@ flag = 'scale';  % Sampling Flag
 % Create the window vector for the design algorithm.
 win = kaiser(N_DEMOD+1, Beta);
 % Calculate the coefficients using the FIR1 function.
-H_LOW_DEMOD  = fir1(N_DEMOD, Fc/(Fs/2), 'low', win, flag);
+H_DEMOD_2  = fir1(N_DEMOD, Fc/(Fs/2), 'low', win, flag);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% LOW PASS FILTER - COSTAS 3
+% All frequency values are in MHz.
+Fs = 5;  % Sampling Frequency
+N_DEMOD    = 10;     % Order
+Fc  = 0.025;     % Cutoff Frequency
+flag = 'scale';  % Sampling Flag
+% Create the window vector for the design algorithm.
+win = kaiser(N_DEMOD+1, Beta);
+% Calculate the coefficients using the FIR1 function.
+H_DEMOD_3  = fir1(N_DEMOD, Fc/(Fs/2), 'low', win, flag);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% LOW PASS FILTER - SMALL
@@ -145,27 +157,27 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CREATE init.c FILE
 % LOW PASS - SMALL
-M = 173;
-N = 2048;
-H_LOW = H_LOW_S;
-
-% LOW PASS - MEDIUM 
-M = 346;
-N = 4096;
-H_LOW = H_LOW_M;
+% M = 173;
+% N = 2048;
+% H_LOW = H_LOW_S;
+% 
+% % LOW PASS - MEDIUM 
+% M = 346;
+% N = 4096;
+% H_LOW = H_LOW_M;
 
 % LOW PASS - LARGE
 M = 693;
 N = 8192;
 H_LOW = H_LOW_L;
-
-% RESAMPLING - SMALL
-N_RES = N_RES_S;
-H_RES = H_RES_S;
-
-% RESAMPLING - MEDIUM 
-N_RES = N_RES_M;
-H_RES = H_RES_M;
+% 
+% % RESAMPLING - SMALL
+% N_RES = N_RES_S;
+% H_RES = H_RES_S;
+% 
+% % RESAMPLING - MEDIUM 
+% N_RES = N_RES_M;
+% H_RES = H_RES_M;
 
 % RESAMPLING - LARGE
 N_RES = N_RES_L;
@@ -193,7 +205,7 @@ fileID = fopen('init.c','w');
 % fprintf(fileID,'{%.10f, %.10f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
 
 % H_DEMOD
-fprintf(fileID,'const double H_DEMOD[2][%d] = {{', N_DEMOD);
+fprintf(fileID,'const double H_DEMOD[3][%d] = {{', N_DEMOD);
 for j = 1:N_DEMOD-1
     fprintf(fileID,'%.15f, ', H_DEMOD_1(j));
 end
@@ -201,7 +213,11 @@ fprintf(fileID,'%.15f},\n\t\t{', H_DEMOD_1(N_DEMOD));
 for j = 1:N_DEMOD-1
     fprintf(fileID,'%.15f, ', H_DEMOD_2(j));
 end
-fprintf(fileID,'%.15f}};\n\n', H_DEMOD_2(N_DEMOD));
+fprintf(fileID,'%.15f},\n\t\t{', H_DEMOD_2(N_DEMOD));
+for j = 1:N_DEMOD-1
+    fprintf(fileID,'%.15f, ', H_DEMOD_3(j));
+end
+fprintf(fileID,'%.15f}};\n\n', H_DEMOD_3(N_DEMOD));
 
 % H_LOW
 fprintf(fileID,'const double H_LOW[%d][2] = {', N);
@@ -249,10 +265,10 @@ fileID = fopen('init.h','w');
 fprintf(fileID,'#ifndef _CONSTS\n');
 fprintf(fileID,'#define _CONSTS\n\n');
 fprintf(fileID,'#define N %d\n', N);
-fprintf(fileID,'#define L %d\n', N-M);
+fprintf(fileID,'#define L %d\n', N-M+1);
 fprintf(fileID,'#define M %d\n', M);
 fprintf(fileID,'#define M_RES %d\n', N_RES);
-fprintf(fileID, '\nconst double H_DEMOD[2][%d];\n', N_DEMOD);
+fprintf(fileID, '\nconst double H_DEMOD[3][%d];\n', N_DEMOD);
 fprintf(fileID, '\nconst double H_LOW[%d][2];\n', N);
 fprintf(fileID, '\nconst double H_RES[6][%d];\n', N_RES);
 fprintf(fileID, '\nconst double OSC[200];\n');
