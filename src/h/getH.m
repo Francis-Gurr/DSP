@@ -154,10 +154,11 @@ fclose(fileID);
 fileID = fopen('init.h','w');
 fprintf(fileID,'#ifndef _CONSTS\n');
 fprintf(fileID,'#define _CONSTS\n');
-fprintf(fileID,'#define FILTER_LEN (%d)\n', N);
+fprintf(fileID,'#define FILTER_LEN %d\n', N);
 fprintf(fileID, '\nconst double H_LOW[%d][2];\n', N);
 fprintf(fileID, '\nconst double H_RES[6][%d];\n', N_RES);
 fprintf(fileID, '\nconst double OSC[200];\n');
 fprintf(fileID,'\n#endif\n');
 
 fclose(fileID);
+
