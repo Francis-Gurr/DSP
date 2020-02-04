@@ -66,6 +66,7 @@ void process_batch(float *p_batch_in, int demod_type) {
 /***** MAIN *****/
 int main(int argc, char *argv[]) {
 	start = clock();
+	printf("N = %d, M = %d, L = %d, L + M - 1 = %d\n", N, M , L, L+M-1);
 
 	/* FILE PATHS */
 	const char *p_FILE_IN = argv[1];
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]) {
 
 	/* FIRST BATCH */
 	begin = clock();
-	process_batch(batch_in, 1);
+	process_batch(batch_in, 0);
 	end = clock();
 	t_first_batch = (double)(end-begin) / CLOCKS_PER_SEC;
 	// Write
