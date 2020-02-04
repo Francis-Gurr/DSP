@@ -52,7 +52,7 @@ void process_batch(float *p_batch_in, int demod_type) {
 
 	/* FIR */
 	begin = clock();
-	fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
+	//fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
 
