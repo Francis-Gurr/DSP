@@ -16,7 +16,7 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 		// Add diff
 		p_buff_diff[offset] = p_diff[i];
 		// Increment offset
-		if (++offset > M_RES) {
+		if (++offset >= M_RES) {
 			offset = 0;
 		}
 		wait--;
