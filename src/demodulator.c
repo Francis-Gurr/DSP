@@ -14,13 +14,13 @@ void demod_coherent(float *p_in, double *p_sum, double *p_diff, int *p_phase){
 
 		// SUM
 		p_sum[i] = val_in * OSC[sum_phase];
-		sum_phase = (sum_phase + 20);
+		sum_phase = (sum_phase + 40);
 		if (sum_phase >= OSC_SIZE) {
 			sum_phase -= OSC_SIZE;
 		}
 		// DIFF 
 		p_diff[i] = val_in * OSC[diff_phase];
-		diff_phase = (diff_phase + 21);
+		diff_phase = (diff_phase + 42);
 		if (diff_phase >= OSC_SIZE) {
 			diff_phase -= OSC_SIZE;
 		}
@@ -51,7 +51,7 @@ void demod_costas(float *p_in, double *p_sum, double *p_diff, int *p_phase) {
 		//lpf_out = val_in * OSC[sin_phase] * I; // Q * I 
 		lpf_out = atan2(OSC[sum_phase],OSC[sin_phase]);
 		// Next phase value
-		sum_phase = sum_phase + (int)(lpf_out * PHASE_SCALE) + 20;
+		sum_phase = sum_phase + (int)(lpf_out * PHASE_SCALE) + 40;
 		if (sum_phase >= OSC_SIZE) {
 			sum_phase -= OSC_SIZE;
 		}
@@ -69,11 +69,11 @@ void demod_costas(float *p_in, double *p_sum, double *p_diff, int *p_phase) {
 		//lpf_out = val_in * OSC[sin_phase] * I; // Q * I 
 		lpf_out = atan2(OSC[diff_phase],OSC[sin_phase]);
 		// Next phase value
-		diff_phase = diff_phase + (int)(lpf_out * PHASE_SCALE) + 21;
+		diff_phase = diff_phase + (int)(lpf_out * PHASE_SCALE) + 42;
 		if (diff_phase >= OSC_SIZE) {
 			diff_phase -= OSC_SIZE;
 		}
 	}
-	p_phase[0] = sum_phase+50;
-	p_phase[1] = diff_phase+50;	
+	p_phase[0] = sum_phase;
+	p_phase[1] = diff_phase;	
 }
