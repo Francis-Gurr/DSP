@@ -11,6 +11,7 @@ Beta = 4.54;     % Window Parameter
 win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
 H_SUM  = fir1(N, [Fc1 Fc2]/(Fs/2), 'bandpass', win, flag);
+H_SUM = fft(H_SUM, 2048);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DIFF FILTER
@@ -25,20 +26,36 @@ Beta = 4.54;     % Window Parameter
 win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
 H_DIFF  = fir1(N, [Fc1 Fc2]/(Fs/2), 'bandpass', win, flag);
+H_DIFF = fft(H_DIFF, 2048);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% LOW PASS FILTER
+% All frequency values are in MHz.
+Fs = 5;  % Sampling Frequency
+N    = 172;     % Order
+Fc  = 0.025;     % First Cutoff Frequency
+flag = 'scale';  % Sampling Flag
+Beta = 4.54;     % Window Parameter
+% Create the window vector for the design algorithm.
+win = kaiser(N+1, Beta);
+% Calculate the coefficients using the FIR1 function.
+H_LOW  = fir1(N, Fc/(Fs/2), 'low', win, flag);
+H_LOW = fft(H_LOW, 2048);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RESAMPLING FILTER
-% All frequency values are in kHz.
-Fs = 48;  % Sampling Frequency
-N    = 172;     % Order
-Fc   = 20;       % Cutoff Frequency
+% All frequency values are in MHz.
+Fs = 30;  % Sampling Frequency
+N    = 767;     % Order
+Fc  = 0.025;     % First Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
 H_RES  = fir1(N, Fc/(Fs/2), 'low', win, flag);
-
+% Split filter
+H_RES = reshape(H_RES,[6,128]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% OSC
@@ -50,42 +67,56 @@ end
 %% CREATE init.c FILE
 M = 173;
 N = 2048;
-
-H_SUM = fft(H_SUM, N);
-H_DIFF = fft(H_DIFF, N);
+N_RES = 128;
 
 fileID = fopen('init.c','w');
 
-% void get_H_SUM(double *p_H_SUM)
-fprintf(fileID,'const double H[2][%d][2] = {{\n\t', N);
-for i = 1:N-1
-    fprintf(fileID,'{%.10f, %.10f},', real(H_SUM(i)), imag(H_SUM(i)));
-    if mod(i,15)==0
-        fprintf(fileID,'\n\t');
-    end
-end
-fprintf(fileID,'{%.10f, %.10f}},\n\t\t{', real(H_SUM(N)), imag(H_SUM(N)));
-
-% void get_H_DIFF(double *p_H_DIFF)
-for i = 1:N-1
-    fprintf(fileID,'{%.10f, %.10f},', real(H_DIFF(i)), imag(H_DIFF(i)));
-    if mod(i,15)==0
-        fprintf(fileID,'\n\t');
-    end
-end
-fprintf(fileID,'{%.10f, %.10f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
-
-
-%  void get_H_RES(double *p_H0, double *p_H1, double *p_H2)
-% N = N/3;
-% H0 = zeros(1, N);
-% H1 = zeros(1, N);
-% H2 = zeros(1, N);
+% % H_SUM
+% fprintf(fileID,'const double H[2][%d][2] = {{\n\t', N);
 % for i = 1:N-1
-%     H0(i) = H_RES((i*3)-2);
-%     H1(i) = H_RES((i*3)-1);
-%     H2(i) = H_RES(i*3);
+%     fprintf(fileID,'{%.10f, %.10f},', real(H_SUM(i)), imag(H_SUM(i)));
+%     if mod(i,15)==0
+%         fprintf(fileID,'\n\t');
+%     end
 % end
+% fprintf(fileID,'{%.10f, %.10f}},\n\t\t{', real(H_SUM(N)), imag(H_SUM(N)));
+% 
+% % H_DIFF
+% for i = 1:N-1
+%     fprintf(fileID,'{%.10f, %.10f},', real(H_DIFF(i)), imag(H_DIFF(i)));
+%     if mod(i,15)==0
+%         fprintf(fileID,'\n\t');
+%     end
+% end
+% fprintf(fileID,'{%.10f, %.10f}}};\n\n', real(H_DIFF(i)), imag(H_DIFF(i)));
+
+% H_LOW
+fprintf(fileID,'const double H_LOW[%d][2] = {', N);
+for i = 1:N-1
+    fprintf(fileID,'{%.10f, %.10f},', real(H_LOW(i)), imag(H_LOW(i)));
+    if mod(i,8)==0
+        fprintf(fileID,'\n\t\t');
+    end
+end
+fprintf(fileID,'{%.10f, %.10f}};\n\n', real(H_LOW(N)), imag(H_LOW(N)));
+
+
+% H_RES
+fprintf(fileID,'const double H_RES[6][%d] = {', N_RES);
+for i = 1:6
+    fprintf(fileID,'{');
+    for j = 1:N_RES-1
+        fprintf(fileID,'%.10f, ', H_RES(i, j));
+        if mod(j,8)==0
+            fprintf(fileID,'\n\t\t');
+        end
+    end
+    if i==6
+        fprintf(fileID,'%.10f}};\n\n', H_RES(i, N_RES));
+    else
+        fprintf(fileID,'%.10f}\n\t\t', H_RES(i, N_RES));
+    end
+end
 % fprintf(fileID,'void get_H_RES(double *p_H0, double *p_H1, double *p_H2) {\n');
 % % H0
 % fprintf(fileID,'\t*p_H0 = %.15f;\n', H0(1));
@@ -124,7 +155,8 @@ fileID = fopen('init.h','w');
 fprintf(fileID,'#ifndef _CONSTS\n');
 fprintf(fileID,'#define _CONSTS\n');
 fprintf(fileID,'#define FILTER_LEN (%d)\n', N);
-fprintf(fileID, '\nconst double H[2][%d][2];\n', N);
+fprintf(fileID, '\nconst double H_LOW[%d][2];\n', N);
+fprintf(fileID, '\nconst double H_RES[6][%d];\n', N_RES);
 fprintf(fileID, '\nconst double OSC[200];\n');
 fprintf(fileID,'\n#endif\n');
 
