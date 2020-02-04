@@ -4,7 +4,7 @@ Beta = 4.54;     % Window Parameter (4.54, 6.76, 8.96)
 %% BAND PASS FILTER - SUM
 % All frequency values are in MHz.
 Fs = 5;  % Sampling Frequency
-N    = 172;     % Order
+N    = 173;     % Order
 Fc1  = 0.98;     % First Cutoff Frequency
 Fc2  = 1.02;     % Second Cutoff Frequency
 flag = 'scale';  % Sampling Flag
@@ -18,7 +18,7 @@ H_SUM = fft(H_SUM, 2048);
 %% BAND PASS FILTER - DIFF
 % All frequency values are in MHz.
 Fs = 5;  % Sampling Frequency
-N    = 172;     % Order
+N    = 173;     % Order
 Fc1  = 1.03;     % First Cutoff Frequency
 Fc2  = 1.07;     % Second Cutoff Frequency
 flag = 'scale';  % Sampling Flag
@@ -68,7 +68,7 @@ H_DEMOD_3  = fir1(N_DEMOD, Fc/(Fs/2), 'low', win, flag);
 %% LOW PASS FILTER - SMALL
 % All frequency values are in MHz.
 Fs = 5;  % Sampling Frequency
-N_S    = 172;     % Order
+N_S    = 173;     % Order
 Fc  = 0.025;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 % Create the window vector for the design algorithm.
@@ -81,7 +81,7 @@ H_LOW_S = fft(H_LOW_S, 2048);
 %% LOW PASS FILTER - MEDIUM
 % All frequency values are in MHz.
 Fs = 5;  % Sampling Frequency
-N_M  = 345;     % Order
+N_M  = 346;     % Order
 Fc  = 0.025;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 % Create the window vector for the design algorithm.
@@ -94,7 +94,7 @@ H_LOW_M = fft(H_LOW_M, 4096);
 %% LOW PASS FILTER - LARGE
 % All frequency values are in MHz.
 Fs = 5;  % Sampling Frequency
-N_L    = 691;     % Order
+N_L    = 692;     % Order
 Fc  = 0.025;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
 % Create the window vector for the design algorithm.
@@ -157,12 +157,12 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CREATE init.c FILE
 % LOW PASS - SMALL
-% M = 173;
+% M = 174;
 % N = 2048;
 % H_LOW = H_LOW_S;
 % 
 % % LOW PASS - MEDIUM 
-% M = 346;
+% M = 347;
 % N = 4096;
 % H_LOW = H_LOW_M;
 
