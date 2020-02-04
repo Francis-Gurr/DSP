@@ -1,3 +1,5 @@
+Beta = 4.54;     % Window Parameter
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BAND PASS FILTER - SUM
 % All frequency values are in MHz.
@@ -6,7 +8,6 @@ N    = 172;     % Order
 Fc1  = 0.98;     % First Cutoff Frequency
 Fc2  = 1.02;     % Second Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
@@ -21,7 +22,6 @@ N    = 172;     % Order
 Fc1  = 1.03;     % First Cutoff Frequency
 Fc2  = 1.07;     % Second Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
@@ -35,7 +35,6 @@ Fs = 5;  % Sampling Frequency
 N_DEMOD = 10;     % Order
 Fc  = 1.9;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N_DEMOD+1, Beta);
 % Calculate the coefficients using the FIR1 function.
@@ -48,7 +47,6 @@ Fs = 5;  % Sampling Frequency
 N_DEMOD    = 10;     % Order
 Fc  = 2;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N_DEMOD+1, Beta);
 % Calculate the coefficients using the FIR1 function.
@@ -61,7 +59,6 @@ Fs = 5;  % Sampling Frequency
 N_S    = 172;     % Order
 Fc  = 0.025;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N_S+1, Beta);
 % Calculate the coefficients using the FIR1 function.
@@ -75,7 +72,6 @@ Fs = 5;  % Sampling Frequency
 N_M  = 345;     % Order
 Fc  = 0.025;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N_M+1, Beta);
 % Calculate the coefficients using the FIR1 function.
@@ -89,7 +85,6 @@ Fs = 5;  % Sampling Frequency
 N_L    = 691;     % Order
 Fc  = 0.025;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N_L+1, Beta);
 % Calculate the coefficients using the FIR1 function.
@@ -104,7 +99,6 @@ N_RES_S = 128
 N    = N_RES_S*6 - 1;     % Order
 Fc  = 0.024;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
@@ -120,7 +114,6 @@ N_RES_M = 512
 N    = N_RES_M*6 - 1;     % Order
 Fc  = 0.024;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
@@ -136,7 +129,6 @@ N_RES_L = 1024
 N    = N_RES_L*6 - 1;     % Order
 Fc  = 0.024;     % Cutoff Frequency
 flag = 'scale';  % Sampling Flag
-Beta = 4.54;     % Window Parameter
 % Create the window vector for the design algorithm.
 win = kaiser(N+1, Beta);
 % Calculate the coefficients using the FIR1 function.
