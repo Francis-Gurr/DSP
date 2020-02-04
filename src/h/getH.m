@@ -1,4 +1,4 @@
-Beta = 4.54;     % Window Parameter
+Beta = 4.54;     % Window Parameter (4.54, 6.76, 8.96)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BAND PASS FILTER - SUM
