@@ -21,6 +21,8 @@ clock_t end;
 clock_t start;
 clock_t finish;
 
+float batch_in[L];
+
 double sum[L];
 double diff[L];
 
@@ -74,7 +76,6 @@ int main(int argc, char *argv[]) {
 	const char *p_FILE_RIGHT = argv[3];
 	
 	FILE *fd = fopen(p_FILE_IN, "rb");
-	float batch_in[L];
 
 	/* FIND FIRST NON-ZERO BATCH */
 	begin = clock();
