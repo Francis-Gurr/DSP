@@ -7,9 +7,6 @@
 #include "resample.h"
 #include<time.h>
 
-#define SIZE_RES 500 
-#define SIZE_WRITE 3
-
 /* TIMINGS */
 double t_total = 0;
 double t_zeros = 0;
@@ -27,8 +24,8 @@ clock_t finish;
 double sum[L];
 double diff[L];
 
-double left[18];
-double right[18];
+double left[OUT_SIZE];
+double right[OUT_SIZE];
 
 /* FIR FILTER */
 double buff_fir_sum[M-1] = {0};
@@ -96,12 +93,12 @@ int main(int argc, char *argv[]) {
 
 	/* FIRST BATCH */
 	begin = clock();
-	process_batch(batch_in, 0);
+	process_batch(batch_in, 1);
 	end = clock();
 	t_first_batch = (double)(end-begin) / CLOCKS_PER_SEC;
 	// Write
-	write_batch(p_FILE_LEFT, 18, left);
-	write_batch(p_FILE_RIGHT, 18, right);
+	write_batch(p_FILE_LEFT, OUT_SIZE, left);
+	write_batch(p_FILE_RIGHT, OUT_SIZE, right);
 
 	int other_batches = 0;
 	while (exit == 0) {
@@ -115,8 +112,8 @@ int main(int argc, char *argv[]) {
 		other_batches++;
 
 		// Write
-		write_batch(p_FILE_LEFT, 18, left);
-		write_batch(p_FILE_RIGHT, 18, right);
+		write_batch(p_FILE_LEFT, OUT_SIZE, left);
+		write_batch(p_FILE_RIGHT, OUT_SIZE, right);
 	}
 
 	t_other_batches = t_other_batches/other_batches;

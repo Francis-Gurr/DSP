@@ -9,16 +9,12 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 	int i;
 	int j;
 	int k = 0;
-	for (i = 0; i < 1875; i++) {
+	for (i = 0; i < L; i++) {
 		/* ADD TO BUFFER */
 		// Add sum
 		p_buff_sum[offset] = p_sum[i];
 		// Add diff
 		p_buff_diff[offset] = p_diff[i];
-		// Increment offset
-		if (++offset >= M_RES) {
-			offset = 0;
-		}
 		wait--;
 
 		/* RESAMPLE */
@@ -30,7 +26,7 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 				sum += p_buff_sum[j] * H_RES[curr_filter][offset-j];
 				diff += p_buff_diff[j] * H_RES[curr_filter][offset-j];
 			}
-			int i_H =  offset + M_RES - 1;
+			int i_H =  offset + M_RES;
 			for (j = M_RES-1; j > offset; j--) {
 				sum += p_buff_sum[j] * H_RES[curr_filter][i_H-j];
 				diff += p_buff_diff[j] * H_RES[curr_filter][i_H-j];
@@ -50,6 +46,10 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 			p_left[k] = (sum - diff) / 2;
 			p_right[k] = (sum + diff) / 2;
 			k++;
+		}
+		// Increment offset
+		if (++offset >= M_RES) {
+			offset = 0;
 		}
 	}	
 	p_buff_params->offset = offset;

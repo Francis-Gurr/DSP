@@ -5,6 +5,7 @@
 #define L 7500
 #define M 693
 #define M_RES 1024
+#define OUT_SIZE 72
 
 const double H_DEMOD[3][10];
 
