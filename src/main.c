@@ -58,7 +58,7 @@ int count = 0;
 /* RESAMPLE */
 double buff_res_sum[M_RES] = {0};
 double buff_res_diff[M_RES] = {0};
-struct Buffer buff_params = {.offset=0, .wait=105, .curr_filter=0};
+struct Buffer buff_params = {.offset=0, .wait=4, .curr_filter=0};
 
 /*** PROCESS BATCH ***/
 void process_batch(float *p_batch_in, int demod_type) {
