@@ -2,8 +2,8 @@
 #include<stdbool.h>
 #include "structs.h"
 #include "io.h"
-//#include "fir.h"
-#include "fir_fft.h"
+#include "fir.h"
+//#include "fir_fft.h"
 #include "demodulator.h"
 #include "resample.h"
 #include<time.h>
@@ -31,12 +31,12 @@ double left[SIZE_OUT];
 double right[SIZE_OUT];
 
 /* FIR FILTER */
-double buff_fir_sum[M-1] = {0};
-double buff_fir_diff[M-1] = {0};
+//double buff_fir_sum[M-1] = {0};
+//double buff_fir_diff[M-1] = {0};
 // Time domain
-//double buff_fir_sum[M] = {0};
-//double buff_fir_diff[M] ={0};
-//int offset = 0;
+double buff_fir_sum[M] = {0};
+double buff_fir_diff[M] ={0};
+int offset = 0;
 
 /* DEMODULATOR */
 void (*demodulators[2])(float *, double *, double *, int *, int *, int *) = {demod_costas_2, demod_coherent};
@@ -63,8 +63,8 @@ void process_batch(float *p_batch_in, int demod_type) {
 
 	/* FIR */
 	begin = clock();
-	fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
-	//fir(sum, diff, buff_fir_sum, buff_fir_diff, &offset);
+	//fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
+	fir(sum, diff, buff_fir_sum, buff_fir_diff, &offset);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
 
