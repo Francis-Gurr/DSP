@@ -34,12 +34,12 @@ double right[SIZE_OUT];
 //double buff_fir_sum[M-1] = {0};
 //double buff_fir_diff[M-1] = {0};
 // Time domain
-double buff_fir1_sum[M] = {0};
-double buff_fir1_diff[M] ={0};
-int offset1 = 0;
-double buff_fir2_sum[M1] = {0};
-double buff_fir2_diff[M1] ={0};
-int offset2 = 0;
+double buff_fir1_sum[M1] = {0};
+double buff_fir1_diff[M1] ={0};
+struct Filter f1 = {.SIZE_IN=L, .SIZE_FILTER=M1, .offset=0};
+double buff_fir2_sum[M2] = {0};
+double buff_fir2_diff[M2] ={0};
+struct Filter f2 = {.SIZE_IN=L_2, .SIZE_FILTER=M2, .offset=0};
 
 /* DEMODULATOR */
 void (*demodulators[2])(float *, double *, double *, double *, int *) = {demod_costas, demod_coherent};
@@ -65,19 +65,19 @@ void process_batch(float *p_batch_in, int demod_type) {
 	/* FIR */
 	begin = clock();
 	//fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
-	fir(sum, diff, buff_fir1_sum, buff_fir1_diff, &offset1, M1, L);
+	fir(sum, diff, buff_fir1_sum, buff_fir1_diff, H_LOW_1, &f1);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
 
 	/* DOWNSAMPLE BY 25 */
-	sum_down[SIZE] = {0};
-	diff_down[SIZE] = {0};
-	for (int i = 0; i < SIZE; i++) { 
-		sum_down = sum[i*25];
-		diff_down = sum[i*25]
+	double sum_down[L_2] = {0};
+	double diff_down[L_2] = {0};
+	for (int i = 0; i < L_2; i++) { 
+		sum_down[i] = sum[i*25];
+		diff_down[i] = sum[i*25];
 	}
 	begin = clock();
-	fir(sum_down, diff_down, buff_fir2_sum, buff_fir2_diff, &offset2, M2, L_2);
+	fir(sum_down, diff_down, buff_fir2_sum, buff_fir2_diff, H_LOW_2, &f2);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
 
