@@ -30,6 +30,13 @@ double diff[L];
 double left[SIZE_OUT];
 double right[SIZE_OUT];
 
+const char *p_FILE_SUM_RES1 = "res_s.dat";
+const char *p_FILE_DIFF_RES1 = "res_d.dat";
+const char *p_FILE_SUM_FIR1 = "fir1_s.dat";
+const char *p_FILE_DIFF_FIR1 = "fir1_d.dat";
+const char *p_FILE_SUM_FIR2 = "fir2_s.dat";
+const char *p_FILE_DIFF_FIR2 = "fir2_d.dat";
+
 /* FIR FILTER */
 //double buff_fir_sum[M-1] = {0};
 //double buff_fir_diff[M-1] = {0};
@@ -68,6 +75,8 @@ void process_batch(float *p_batch_in, int demod_type) {
 	fir(sum, diff, buff_fir1_sum, buff_fir1_diff, H_LOW_1, &f1);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
+	write_batch(p_FILE_SUM_FIR1, L, sum);
+	write_batch(p_FILE_DIFF_FIR1, L, diff);
 
 	/* DOWNSAMPLE BY 25 */
 	double sum_down[L_2] = {0};
@@ -76,17 +85,19 @@ void process_batch(float *p_batch_in, int demod_type) {
 		sum_down[i] = sum[i*25];
 		diff_down[i] = sum[i*25];
 	}
+	write_batch(p_FILE_SUM_RES1, L_2, sum_down);
+	write_batch(p_FILE_DIFF_RES1, L_2, diff_down);
+
 	begin = clock();
 	fir(sum_down, diff_down, buff_fir2_sum, buff_fir2_diff, H_LOW_2, &f2);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
-
-//	write_batch(p_FILE_SUM, L, sum);
-//	write_batch(p_FILE_DIFF, L, diff);
+	write_batch(p_FILE_SUM_FIR2, L_2, sum_down);
+	write_batch(p_FILE_DIFF_FIR2, L_2, diff_down);
 
 	/*RESAMPLE */
 	begin = clock();
-	resample(sum, diff, buff_res_sum, buff_res_diff, &buff_params, left, right);
+	resample(sum_down, diff_down, buff_res_sum, buff_res_diff, &buff_params, left, right);
 	end = clock();
 	t_res += (double)(end-begin) / CLOCKS_PER_SEC;
 }
