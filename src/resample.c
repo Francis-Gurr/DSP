@@ -44,10 +44,8 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 			}
 
 			/* GET LEFT AND RIGHT */
-			//p_left[k] = (sum - diff) / 2;
-			//p_right[k] = (sum + diff) / 2;
-			p_left[k] = sum;
-			p_right[k] = diff;
+			p_left[k] = (sum - diff) / 2;
+			p_right[k] = (sum + diff) / 2;
 			k++;
 		}
 		// Increment offset

@@ -75,25 +75,19 @@ void process_batch(float *p_batch_in, int demod_type) {
 	fir(sum, diff, buff_fir1_sum, buff_fir1_diff, H_LOW_1, &f1);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
-	write_batch(p_FILE_SUM_FIR1, L, sum);
-	write_batch(p_FILE_DIFF_FIR1, L, diff);
 
 	/* DOWNSAMPLE BY 25 */
 	double sum_down[L_2] = {0};
 	double diff_down[L_2] = {0};
 	for (int i = 0; i < L_2; i++) { 
 		sum_down[i] = sum[i*25];
-		diff_down[i] = sum[i*25];
+		diff_down[i] = diff[i*25];
 	}
-	write_batch(p_FILE_SUM_RES1, L_2, sum_down);
-	write_batch(p_FILE_DIFF_RES1, L_2, diff_down);
 
 	begin = clock();
 	fir(sum_down, diff_down, buff_fir2_sum, buff_fir2_diff, H_LOW_2, &f2);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
-	write_batch(p_FILE_SUM_FIR2, L_2, sum_down);
-	write_batch(p_FILE_DIFF_FIR2, L_2, diff_down);
 
 	/*RESAMPLE */
 	begin = clock();
