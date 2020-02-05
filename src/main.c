@@ -26,12 +26,16 @@ float batch_in[L];
 double sum[L];
 double diff[L];
 
-double left[OUT_SIZE];
-double right[OUT_SIZE];
+double left[SIZE_OUT];
+double right[SIZE_OUT];
 
 /* FIR FILTER */
-double buff_fir_sum[M-1] = {0};
-double buff_fir_diff[M-1] = {0};
+//double buff_fir_sum[M-1] = {0};
+//double buff_fir_diff[M-1] = {0};
+// Time domain
+double buff_fir_sum[L] = {0};
+double buff_fir_diff[L] ={0};
+int offset = 0;
 
 /* DEMODULATOR */
 void (*demodulators[2])(float *, double *, double *, int *) = {demod_costas, demod_coherent};
@@ -54,7 +58,8 @@ void process_batch(float *p_batch_in, int demod_type) {
 
 	/* FIR */
 	begin = clock();
-	fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
+	//fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
+	fir(sum, diff, buff_fir_sum, buff_fir_diff, &offset);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
 
@@ -99,8 +104,8 @@ int main(int argc, char *argv[]) {
 	end = clock();
 	t_first_batch = (double)(end-begin) / CLOCKS_PER_SEC;
 	// Write
-	write_batch(p_FILE_LEFT, OUT_SIZE, left);
-	write_batch(p_FILE_RIGHT, OUT_SIZE, right);
+	write_batch(p_FILE_LEFT, SIZE_OUT, left);
+	write_batch(p_FILE_RIGHT, SIZE_OUT, right);
 
 	int other_batches = 0;
 	while (exit == 0) {
@@ -114,8 +119,8 @@ int main(int argc, char *argv[]) {
 		other_batches++;
 
 		// Write
-		write_batch(p_FILE_LEFT, OUT_SIZE, left);
-		write_batch(p_FILE_RIGHT, OUT_SIZE, right);
+		write_batch(p_FILE_LEFT, SIZE_OUT, left);
+		write_batch(p_FILE_RIGHT, SIZE_OUT, right);
 	}
 
 	t_other_batches = t_other_batches/other_batches;
