@@ -17,12 +17,12 @@ void fir(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_diff,
 			sum += p_buff_sum[j] * H_LOW[offset-j];
 			diff += p_buff_diff[j] * H_LOW[offset-j];
 		}
-		int i_H =  offset + L - 1;
-		for (j = L-1; j > offset; j--) {
+		int i_H =  offset + M;
+		for (j = M-1; j > offset; j--) {
 			sum += p_buff_sum[j] * H_LOW[i_H-j];
 			diff += p_buff_diff[j] * H_LOW[i_H-j];
 		}
-		if (++offset >= L) {
+		if (++offset >= M) {
 			offset = 0;
 		}
 		p_sum[i] = sum;

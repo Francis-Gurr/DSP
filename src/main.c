@@ -34,8 +34,8 @@ double right[SIZE_OUT];
 double buff_fir_sum[M-1] = {0};
 double buff_fir_diff[M-1] = {0};
 // Time domain
-//double buff_fir_sum[L] = {0};
-//double buff_fir_diff[L] ={0};
+//double buff_fir_sum[M] = {0};
+//double buff_fir_diff[M] ={0};
 //int offset = 0;
 
 /* DEMODULATOR */
