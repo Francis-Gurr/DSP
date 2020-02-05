@@ -9,7 +9,7 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 	int i;
 	int j;
 	int k = 0;
-	for (i = 0; i < L; i++) {
+	for (i = 0; i < L_2; i++) {
 		/* ADD TO BUFFER */
 		// Add sum
 		p_buff_sum[offset] = p_sum[i];
@@ -37,10 +37,10 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 				curr_filter = 0;
 			}
 			if (curr_filter == 5) {
-				wait = 105;
+				wait = 5;
 			}
 			else {
-				wait = 104;
+				wait = 4;
 			}
 
 			/* GET LEFT AND RIGHT */

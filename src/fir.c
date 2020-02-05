@@ -1,10 +1,10 @@
 #include "h/init.h"
 
-void fir(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_diff, int *p_offset) {
+void fir(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_diff, int *p_offset, int M, int SIZE) {
 	int i;
 	int j;
 	int offset = *p_offset;
-	for (i = 0; i < L; i++) {
+	for (i = 0; i < SIZE; i++) {
 		/* ADD TO BUFFER */
 		// Add sum
 		p_buff_sum[offset] = p_sum[i];

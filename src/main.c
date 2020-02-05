@@ -34,12 +34,12 @@ double right[SIZE_OUT];
 //double buff_fir_sum[M-1] = {0};
 //double buff_fir_diff[M-1] = {0};
 // Time domain
-double buff_fir_sum[M] = {0};
-double buff_fir_diff[M] ={0};
-int offset = 0;
-//double buff_fir2_sum[M1] = {0};
-//double buff_fir2_diff[M1] ={0};
-//int offset2 = 0;
+double buff_fir1_sum[M] = {0};
+double buff_fir1_diff[M] ={0};
+int offset1 = 0;
+double buff_fir2_sum[M1] = {0};
+double buff_fir2_diff[M1] ={0};
+int offset2 = 0;
 
 /* DEMODULATOR */
 void (*demodulators[2])(float *, double *, double *, double *, int *) = {demod_costas, demod_coherent};
@@ -58,7 +58,6 @@ void process_batch(float *p_batch_in, int demod_type) {
 	
 	/* DEMODULATE */
 	begin = clock();
-
 	(*demodulators[demod_type])(p_batch_in, sum, diff, phi, &count);
 	end = clock();
 	t_demod[demod_type] += (double)(end-begin) / CLOCKS_PER_SEC;
@@ -66,14 +65,21 @@ void process_batch(float *p_batch_in, int demod_type) {
 	/* FIR */
 	begin = clock();
 	//fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
-	fir(sum, diff, buff_fir_sum, buff_fir_diff, &offset);
+	fir(sum, diff, buff_fir1_sum, buff_fir1_diff, &offset1, M1, L);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
 
-	/* DOWNSAMPLE */
-	for (int i = 0; i < L; i++) { 
-
+	/* DOWNSAMPLE BY 25 */
+	sum_down[SIZE] = {0};
+	diff_down[SIZE] = {0};
+	for (int i = 0; i < SIZE; i++) { 
+		sum_down = sum[i*25];
+		diff_down = sum[i*25]
 	}
+	begin = clock();
+	fir(sum_down, diff_down, buff_fir2_sum, buff_fir2_diff, &offset2, M2, L_2);
+	end = clock();
+	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
 
 //	write_batch(p_FILE_SUM, L, sum);
 //	write_batch(p_FILE_DIFF, L, diff);
@@ -88,7 +94,6 @@ void process_batch(float *p_batch_in, int demod_type) {
 /***** MAIN *****/
 int main(int argc, char *argv[]) {
 	start = clock();
-	printf("N = %d, M = %d, L = %d, L + M - 1 = %d\n", N, M , L, L+M-1);
 
 	/* FILE PATHS */
 	const char *p_FILE_IN = argv[1];
