@@ -2,9 +2,9 @@
 %% CHOOSE FILTERS
 
 % Choose from: 16, 32, 64, 128, 256, 512
-N_LOW_1 = 512;
-N_LOW_2 = 512;
-N_RES =   512;
+N_LOW_1 = 16;
+N_LOW_2 = 16;
+N_RES =   16;
 Beta = 4.54;     % Window Parameter (4.54, 6.76, 8.96)
 
 H_LOW_1 = getH(5, (N_LOW_1-1), 1, Beta);
