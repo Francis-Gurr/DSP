@@ -8,7 +8,7 @@
 #define M_RES 1024
 #define SIZE_OUT 36
 
-const double H_DEMOD[3][10];
+const double H_DEMOD[3][100];
 
 const double H_LOW[4096][2];
 
