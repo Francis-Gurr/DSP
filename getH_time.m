@@ -165,7 +165,7 @@ fprintf(fileID,'#ifndef _CONSTS\n');
 fprintf(fileID,'#define _CONSTS\n\n');
 fprintf(fileID,'#define N %d\n', 0);
 fprintf(fileID,'#define L %d\n', 1875);
-fprintf(fileID, '#define L2 %d\n', ((N-M+1) *2));
+fprintf(fileID, '#define L2 %d\n', (1875 *2));
 fprintf(fileID,'#define M %d\n', N);
 fprintf(fileID,'#define M_RES %d\n', N_RES);
 SIZE_OUT = 1875 * 6/625;
