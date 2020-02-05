@@ -8,8 +8,8 @@ N_RES =   512;
 Beta = 4.54;     % Window Parameter (4.54, 6.76, 8.96)
 
 H_LOW_1 = getH(5, (N_LOW_1-1), 1, Beta);
-H_LOW_2 = getH(0.2, (N_LOW_2-1), 0.025, Beta);
-H_RES = getH(1.2, ((N_RES*6)-1), 0.025, Beta);
+H_LOW_2 = getH(1, (N_LOW_2-1), 0.025, Beta);
+H_RES = getH(6, ((N_RES*6)-1), 0.025, Beta);
 H_RES = reshape(H_RES,[6,N_RES]);
 
 % Batch Size * 6/625 = int
