@@ -37,14 +37,16 @@ double right[SIZE_OUT];
 double buff_fir_sum[M] = {0};
 double buff_fir_diff[M] ={0};
 int offset = 0;
+//double buff_fir2_sum[M1] = {0};
+//double buff_fir2_diff[M1] ={0};
+//int offset2 = 0;
 
 /* DEMODULATOR */
-void (*demodulators[2])(float *, double *, double *, int *, int *, int *) = {demod_costas_2, demod_coherent};
-int phase[2] = {0};
-int phi[2] = {0};
+void (*demodulators[2])(float *, double *, double *, double *, int *) = {demod_costas, demod_coherent};
+double phi[2] = {0};
 int count = 0;
-const char *p_FILE_SUM = "s.dat";
-const char *p_FILE_DIFF = "d.dat";
+//const char *p_FILE_SUM = "s.dat";
+//const char *p_FILE_DIFF = "d.dat";
 
 /* RESAMPLE */
 double buff_res_sum[M_RES] = {0};
@@ -57,7 +59,7 @@ void process_batch(float *p_batch_in, int demod_type) {
 	/* DEMODULATE */
 	begin = clock();
 
-	(*demodulators[demod_type])(p_batch_in, sum, diff, phase, phi, &count);
+	(*demodulators[demod_type])(p_batch_in, sum, diff, phi, &count);
 	end = clock();
 	t_demod[demod_type] += (double)(end-begin) / CLOCKS_PER_SEC;
 
@@ -68,8 +70,13 @@ void process_batch(float *p_batch_in, int demod_type) {
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
 
-	write_batch(p_FILE_SUM, L, sum);
-	write_batch(p_FILE_DIFF, L, diff);
+	/* DOWNSAMPLE */
+	for (int i = 0; i < L; i++) { 
+
+	}
+
+//	write_batch(p_FILE_SUM, L, sum);
+//	write_batch(p_FILE_DIFF, L, diff);
 
 	/*RESAMPLE */
 	begin = clock();
@@ -100,16 +107,16 @@ int main(int argc, char *argv[]) {
 		zero_batches++;
 		read_batch(fd, batch_in, &exit);
 	// Check for non-zeros
-		//check_zeros(batch_in, fd, &all_zeros);
-		all_zeros = 0;
+		check_zeros(batch_in, fd, &all_zeros);
+		//all_zeros = 0;
 	}
 	end = clock();
 	t_zeros = (double)((end-begin) / CLOCKS_PER_SEC) / zero_batches;
 
 	/* FIRST BATCH */
 	begin = clock();
-	//demod_costas_2(batch_in, sum, diff, phase, phi, &count);
-	//count = 0;
+	demod_costas(batch_in, sum, diff, phi, &count);
+	count = 0;
 	process_batch(batch_in, 1);
 	end = clock();
 	t_first_batch = (double)(end-begin) / CLOCKS_PER_SEC;
