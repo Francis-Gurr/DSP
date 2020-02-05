@@ -74,6 +74,5 @@ void demod_costas(float *p_in, double *p_sum, double *p_diff, double *p_phi, int
 	}
 	p_phi[0] = phi_sum[sizeof(phi_sum-1)];
 	p_phi[1] = phi_diff[sizeof(phi_diff-1)];
-	printf("PHI_SUM: %f\tPHI_DIFF: %f\n", p_phi[0], p_phi[1]);
 	*p_count = count;
 }
