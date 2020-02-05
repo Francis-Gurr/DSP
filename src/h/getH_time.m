@@ -2,9 +2,9 @@
 %% CHOOSE FILTERS
 
 % Choose from: 16, 32, 64, 128, 256, 512
-N_LOW_1 = 32;
-N_LOW_2 = 128;
-N_RES =   256;
+N_LOW_1 = 512;
+N_LOW_2 = 512;
+N_RES =   512;
 Beta = 4.54;     % Window Parameter (4.54, 6.76, 8.96)
 
 H_LOW_1 = getH(5, (N_LOW_1-1), 2, Beta);
@@ -65,7 +65,7 @@ fprintf(fileID,'#ifndef _CONSTS\n');
 fprintf(fileID,'#define _CONSTS\n\n');
 fprintf(fileID,'#define L %d\n', L);
 fprintf(fileID, '#define L2 %d\n', (L*2));
-fprintf(fileID, '#define L_2 %d\n', (L/2));
+fprintf(fileID, '#define L_2 %d\n', floor(L/25));
 fprintf(fileID,'#define M1 %d\n', N_LOW_1);
 fprintf(fileID,'#define M2 %d\n', N_LOW_2);
 fprintf(fileID,'#define M_RES %d\n', N_RES);
