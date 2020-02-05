@@ -3,6 +3,7 @@
 
 #define L 1875
 #define L2 3750
+#define L_2 9.375000e+02
 #define M1 32
 #define M2 128
 #define M_RES 256

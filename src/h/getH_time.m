@@ -8,8 +8,8 @@ N_RES =   256;
 Beta = 4.54;     % Window Parameter (4.54, 6.76, 8.96)
 
 H_LOW_1 = getH(5, (N_LOW_1-1), 2, Beta);
-H_LOW_2 = getH(1, (N_LOW_2-1), 0.05, Beta);
-H_RES = getH(6, ((N_RES*6)-1), 0.025, Beta);
+H_LOW_2 = getH(0.2, (N_LOW_2-1), 0.05, Beta);
+H_RES = getH(1.2, ((N_RES*6)-1), 0.025, Beta);
 H_RES = reshape(H_RES,[6,N_RES]);
 
 % Batch Size * 6/625 = int
@@ -65,6 +65,7 @@ fprintf(fileID,'#ifndef _CONSTS\n');
 fprintf(fileID,'#define _CONSTS\n\n');
 fprintf(fileID,'#define L %d\n', L);
 fprintf(fileID, '#define L2 %d\n', (L*2));
+fprintf(fileID, '#define L_2 %d\n', (L/2));
 fprintf(fileID,'#define M1 %d\n', N_LOW_1);
 fprintf(fileID,'#define M2 %d\n', N_LOW_2);
 fprintf(fileID,'#define M_RES %d\n', N_RES);
