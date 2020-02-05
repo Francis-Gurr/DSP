@@ -2,9 +2,7 @@
 #include<unistd.h>
 #include<fcntl.h>
 #include<stdlib.h>
-
-#define L2 3750
-#define L 1875
+#include "h/init.h"
 
 void read_batch(FILE *fd, float *p_batch, int *p_exit) {
 	float batch_double[L2] = {0};

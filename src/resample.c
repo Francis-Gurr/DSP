@@ -26,11 +26,12 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 				sum += p_buff_sum[j] * H_RES[curr_filter][offset-j];
 				diff += p_buff_diff[j] * H_RES[curr_filter][offset-j];
 			}
-			int i_H =  offset + M_RES - 1;
+			int i_H =  offset + M_RES;
 			for (j = M_RES-1; j > offset; j--) {
 				sum += p_buff_sum[j] * H_RES[curr_filter][i_H-j];
 				diff += p_buff_diff[j] * H_RES[curr_filter][i_H-j];
 			}
+
 			// Increment current filter and buffer wait value 
 			if (++curr_filter > 5) {
 				curr_filter = 0;

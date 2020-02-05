@@ -2,6 +2,7 @@
 
 void fir(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_diff, int *p_offset) {
 	int i;
+	int j;
 	int offset = *p_offset;
 	for (i = 0; i < L; i++) {
 		/* ADD TO BUFFER */
@@ -13,15 +14,15 @@ void fir(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_diff,
 		double sum = 0;
 		double diff = 0;
 		for (j = offset; j >= 0; j--) {
-			sum += p_buff_sum[j] * H_LOW[0][offset-j];
-			diff += p_buff_diff[j] * H_LOW[1][offset-j];
+			sum += p_buff_sum[j] * H_LOW[offset-j];
+			diff += p_buff_diff[j] * H_LOW[offset-j];
 		}
 		int i_H =  offset + L - 1;
 		for (j = L-1; j > offset; j--) {
-			sum += p_buff_sum[j] * H_LOW[0][i_H-j];
-			diff += p_buff_diff[j] * H_LOW[1][i_H-j];
+			sum += p_buff_sum[j] * H_LOW[i_H-j];
+			diff += p_buff_diff[j] * H_LOW[i_H-j];
 		}
-		if (++offset >= SIZE) {
+		if (++offset >= L) {
 			offset = 0;
 		}
 		p_sum[i] = sum;

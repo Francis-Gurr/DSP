@@ -2,6 +2,7 @@
 #include<stdbool.h>
 #include "structs.h"
 #include "io.h"
+//#include "fir.h"
 #include "fir_fft.h"
 #include "demodulator.h"
 #include "resample.h"
@@ -30,21 +31,25 @@ double left[SIZE_OUT];
 double right[SIZE_OUT];
 
 /* FIR FILTER */
-//double buff_fir_sum[M-1] = {0};
-//double buff_fir_diff[M-1] = {0};
+double buff_fir_sum[M-1] = {0};
+double buff_fir_diff[M-1] = {0};
 // Time domain
-double buff_fir_sum[L] = {0};
-double buff_fir_diff[L] ={0};
-int offset = 0;
+//double buff_fir_sum[L] = {0};
+//double buff_fir_diff[L] ={0};
+//int offset = 0;
 
 /* DEMODULATOR */
-void (*demodulators[2])(float *, double *, double *, int *) = {demod_costas, demod_coherent};
+void (*demodulators[2])(float *, double *, double *, int *, int *, int *) = {demod_costas_2, demod_coherent};
 int phase[2] = {0};
+int phi[2] = {0};
+int count = 0;
+const char *p_FILE_SUM = "s.dat";
+const char *p_FILE_DIFF = "d.dat";
 
 /* RESAMPLE */
 double buff_res_sum[M_RES] = {0};
 double buff_res_diff[M_RES] = {0};
-struct Buffer buff_params = {.offset=0, .wait=104, .curr_filter=0};
+struct Buffer buff_params = {.offset=0, .wait=105, .curr_filter=0};
 
 /*** PROCESS BATCH ***/
 void process_batch(float *p_batch_in, int demod_type) {
@@ -52,16 +57,19 @@ void process_batch(float *p_batch_in, int demod_type) {
 	/* DEMODULATE */
 	begin = clock();
 
-	(*demodulators[demod_type])(p_batch_in, sum, diff, phase);
+	(*demodulators[demod_type])(p_batch_in, sum, diff, phase, phi, &count);
 	end = clock();
 	t_demod[demod_type] += (double)(end-begin) / CLOCKS_PER_SEC;
 
 	/* FIR */
 	begin = clock();
-	//fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
-	fir(sum, diff, buff_fir_sum, buff_fir_diff, &offset);
+	fir_fft(sum, diff, buff_fir_sum, buff_fir_diff);
+	//fir(sum, diff, buff_fir_sum, buff_fir_diff, &offset);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
+
+	write_batch(p_FILE_SUM, L, sum);
+	write_batch(p_FILE_DIFF, L, diff);
 
 	/*RESAMPLE */
 	begin = clock();
@@ -91,15 +99,17 @@ int main(int argc, char *argv[]) {
 		// Read
 		zero_batches++;
 		read_batch(fd, batch_in, &exit);
-
-		// Check for non-zeros
-		check_zeros(batch_in, fd, &all_zeros);
+	// Check for non-zeros
+		//check_zeros(batch_in, fd, &all_zeros);
+		all_zeros = 0;
 	}
 	end = clock();
 	t_zeros = (double)((end-begin) / CLOCKS_PER_SEC) / zero_batches;
 
 	/* FIRST BATCH */
 	begin = clock();
+	//demod_costas_2(batch_in, sum, diff, phase, phi, &count);
+	//count = 0;
 	process_batch(batch_in, 1);
 	end = clock();
 	t_first_batch = (double)(end-begin) / CLOCKS_PER_SEC;
