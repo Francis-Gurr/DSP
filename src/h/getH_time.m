@@ -15,6 +15,11 @@ H_RES = reshape(H_RES,[6,N_RES]);
 % Batch Size * 6/625 = int
 L = 1875;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% OSC
+for i = 1:200
+	OSC(i) = cos(((i-1)/100)*pi);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CREATE init.c FILE
 fileID = fopen('init.c','w');
 
@@ -55,6 +60,16 @@ for i = 1:6
     end
 end
 
+fprintf(fileID,'\n\nconst double OSC[200] = {');
+for i = 1:199
+    fprintf(fileID,'%.15f,', OSC(i));
+    if mod(i,20)==0
+        fprintf(fileID,'\n\t');
+    end
+end
+fprintf(fileID,'%.15f};', OSC(200));
+
+
 fclose(fileID);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,6 +88,7 @@ fprintf(fileID,'#define SIZE_OUT %d\n', (L*6/625));
 fprintf(fileID, '\nconst double H_LOW_1[M1];\n');
 fprintf(fileID, '\nconst double H_LOW_2[M2];\n');
 fprintf(fileID, '\nconst double H_RES[6][M_RES];\n');
+fprintf(fileID, '\nconst double OSC[200];\n');
 fprintf(fileID,'\n#endif\n');
 
 fclose(fileID);

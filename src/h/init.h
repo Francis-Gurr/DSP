@@ -15,4 +15,6 @@ const double H_LOW_2[M2];
 
 const double H_RES[6][M_RES];
 
+const double OSC[200];
+
 #endif
