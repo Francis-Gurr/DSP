@@ -21,13 +21,13 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 			// Fir
 			double sum = 0;
 			double diff = 0;
-			#pragma omp parallel for shared(H_RES, p_buff_sum, p_buff_diff, curr_filter, offset) reduction(+:sum,diff)
+			#pragma omp parallel for shared(p_buff_sum, p_buff_diff, curr_filter, offset) reduction(+:sum,diff)
 			for (int j = offset; j >= 0; j--) {
 				sum += p_buff_sum[j] * H_RES[curr_filter][offset-j];
 				diff += p_buff_diff[j] * H_RES[curr_filter][offset-j];
 			}
 			int i_H =  offset + M_RES;
-			#pragma omp parallel for shared(H_RES, p_buff_sum, p_buff_diff, curr_filter, offset, i_H) reduction(+:sum,diff)
+			#pragma omp parallel for shared(p_buff_sum, p_buff_diff, curr_filter, offset, i_H) reduction(+:sum,diff)
 			for (int j = M_RES-1; j > offset; j--) {
 				sum += p_buff_sum[j] * H_RES[curr_filter][i_H-j];
 				diff += p_buff_diff[j] * H_RES[curr_filter][i_H-j];
