@@ -30,6 +30,9 @@ double diff[L];
 double left[SIZE_OUT];
 double right[SIZE_OUT];
 
+double max_left = 0;
+double max_right = 0;
+
 /* FIR FILTER */
 //double buff_fir_sum[M-1] = {0};
 //double buff_fir_diff[M-1] = {0};
@@ -40,18 +43,27 @@ struct Filter f1 = {.SIZE_IN=L, .SIZE_FILTER=M1, .offset=0};
 double buff_fir2_sum[M2] = {0};
 double buff_fir2_diff[M2] ={0};
 struct Filter f2 = {.SIZE_IN=L_2, .SIZE_FILTER=M2, .offset=0};
+const char *p_FILE_SUM_FIR1 = "out/fir1_s.dat";
+const char *p_FILE_DIFF_FIR1 = "out/fir1_d.dat";
+const char *p_FILE_SUM_FIR2 = "out/fir2_s.dat";
+const char *p_FILE_DIFF_FIR2 = "out/fir2_d.dat";
 
 /* DEMODULATOR */
 double phi[2] = {0};
 int count = 0;
 int phase[2];
-//const char *p_FILE_SUM = "s.dat";
-//const char *p_FILE_DIFF = "d.dat";
+const char *p_FILE_SUM_DEMOD = "out/demod_s.dat";
+const char *p_FILE_DIFF_DEMOD = "out/demod_d.dat";
 
 /* RESAMPLE */
 double buff_res_sum[M_RES] = {0};
 double buff_res_diff[M_RES] = {0};
 struct Buffer buff_params = {.offset=0, .wait=4, .curr_filter=0};
+const char *p_FILE_SUM_RES = "out/res_s.dat";
+const char *p_FILE_DIFF_RES = "out/res_d.dat";
+
+const char *p_left_norm = "left_norm.dat";
+const char *p_right_norm = "right_norm.dat";
 
 /*** PROCESS BATCH ***/
 void process_batch(float *p_batch_in, int demod_type) {
@@ -61,6 +73,8 @@ void process_batch(float *p_batch_in, int demod_type) {
 	demod_coherent(p_batch_in, sum, diff, phi, phase);
 	end = clock();
 	t_demod[demod_type] += (double)(end-begin) / CLOCKS_PER_SEC;
+	write_batch(p_FILE_SUM_DEMOD, L, sum);
+	write_batch(p_FILE_DIFF_DEMOD, L, diff);
 
 	/* FIR */
 	begin = clock();
@@ -68,6 +82,8 @@ void process_batch(float *p_batch_in, int demod_type) {
 	fir(sum, diff, buff_fir1_sum, buff_fir1_diff, H_LOW_1, &f1);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
+	write_batch(p_FILE_SUM_FIR1, L, sum);
+	write_batch(p_FILE_DIFF_FIR1, L, diff);
 
 	/* DOWNSAMPLE BY 25 */
 	double sum_down[L_2] = {0};
@@ -76,15 +92,19 @@ void process_batch(float *p_batch_in, int demod_type) {
 		sum_down[i] = sum[i*25];
 		diff_down[i] = diff[i*25];
 	}
+	write_batch(p_FILE_SUM_RES, L_2, sum);
+	write_batch(p_FILE_DIFF_RES, L_2, diff);
 
 	begin = clock();
 	fir(sum_down, diff_down, buff_fir2_sum, buff_fir2_diff, H_LOW_2, &f2);
 	end = clock();
 	t_fir += (double)(end-begin) / CLOCKS_PER_SEC;
+	write_batch(p_FILE_SUM_FIR2, L_2, sum);
+	write_batch(p_FILE_DIFF_FIR2, L_2, diff);
 
 	/*RESAMPLE */
 	begin = clock();
-	resample(sum_down, diff_down, buff_res_sum, buff_res_diff, &buff_params, left, right);
+	resample(sum_down, diff_down, buff_res_sum, buff_res_diff, &buff_params, left, right, &max_left, &max_right);
 	end = clock();
 	t_res += (double)(end-begin) / CLOCKS_PER_SEC;
 }
@@ -146,6 +166,35 @@ int main(int argc, char *argv[]) {
 
 	t_other_batches = t_other_batches/other_batches;
 	fclose(fd);
+	
+	/* Normalise */
+	exit = 0;
+	float factor_right = (float) (1/max_right);
+	printf("right: %f\n", factor_right);
+	float factor_left = (float) (1/max_left);
+	printf("left: %f\n", factor_left);
+	FILE *fd_left = fopen(p_FILE_LEFT, "rb");
+	FILE *fd_right = fopen(p_FILE_RIGHT, "rb");
+	FILE *fd_left_norm = fopen(p_left_norm, "ab");
+	FILE *fd_right_norm = fopen(p_right_norm, "ab");
+	int sz = 4096;
+	while (4096 == sz) {
+		float left[4096] = {0};
+		float right[4096] = {0};
+		sz = fread(left, 4, 4096, fd_left);
+		sz = fread(right, 4, 4096, fd_right);
+		for (int i = 0; i < sz; i++) {
+			left[i] = left[i] * factor_left;
+			right[i] = right[i] * factor_right;
+		}
+		fwrite(left, 4, sz, fd_left_norm); 
+		fwrite(right, 4, sz, fd_right_norm); 
+	}
+	fclose(fd_left);
+	fclose(fd_right);
+	fclose(fd_left_norm);
+	fclose(fd_right_norm);
+
 
 	finish = clock();
 	t_total = (double)(finish-start) / CLOCKS_PER_SEC;

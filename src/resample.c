@@ -2,7 +2,7 @@
 #include "h/init.h"
 #include <stdio.h>
 
-void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_diff, struct Buffer *p_buff_params, double *p_left, double *p_right) {
+void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_diff, struct Buffer *p_buff_params, double *p_left, double *p_right, double *max_left, double *max_right) {
 	int offset = p_buff_params->offset;
 	int wait = p_buff_params->wait;
 	int curr_filter = p_buff_params->curr_filter;
@@ -47,6 +47,12 @@ void resample(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_
 			/* GET LEFT AND RIGHT */
 			p_left[k] = (sum - diff) / 2;
 			p_right[k] = (sum + diff) / 2;
+			if (p_left[k] > *max_left) {
+				*max_left = p_left[k];
+			}
+			if (p_right[k] > *max_right) {
+				*max_right = p_right[k];
+			}
 			k++;
 		}
 		// Increment offset
