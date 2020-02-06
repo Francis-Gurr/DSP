@@ -8,6 +8,9 @@
 #define M2 16
 #define M_RES 16
 #define SIZE_OUT 4096 
+#define SUM_FREQ 1.256637061
+#define DIFF_FREQ 1.319468915
+#define PHI_INC 0.0001
 
 const double H_LOW_1[M1];
 

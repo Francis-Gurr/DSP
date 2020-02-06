@@ -1,10 +1,7 @@
 #include <stdio.h>
-#include<stdbool.h>
 #include "structs.h"
-#include "io.h"
-#include "fir.h"
-#include "demodulator.h"
-#include "resample.h"
+#include "h/init.h"
+#include "math.h"
 #include<time.h>
 
 /* TIMINGS */
