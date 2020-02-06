@@ -6,16 +6,9 @@
  * *************/
 
 #include <stdio.h>
-#include "structs.h"
 #include "demodulator.h"
-#include<time.h>
 #include<stdlib.h>
 #include"init.h"
-
-/* TIMINGS */
-double t_total = 0;
-clock_t start;
-clock_t finish;
 
 float batch_double[L2];
 double batch_in[L];
@@ -35,10 +28,8 @@ double right[SIZE_OUT];
 double buff_fir1_sum[M1] = {0};
 double buff_fir1_diff[M1] ={0};
 int offset1 = 0;
-struct Filter f1 = {.SIZE_IN=L, .SIZE_FILTER=M1, .offset=0};
 double buff_fir2_sum[M2] = {0};
 double buff_fir2_diff[M2] ={0};
-struct Filter f2 = {.SIZE_IN=L_2, .SIZE_FILTER=M2, .offset=0};
 int offset2 = 0;
 
 /* DEMODULATOR */
@@ -49,7 +40,6 @@ int diff_phase;
 /* RESAMPLE */
 double buff_res_sum[M_RES] = {0};
 double buff_res_diff[M_RES] = {0};
-struct Buffer buff_params = {.offset=0, .wait=4, .curr_filter=0};
 int offset_res = 0;
 int curr_filter = 0;
 int wait_res = 4;
@@ -57,7 +47,7 @@ int wait_res = 4;
 int index1 = 0;
 /*** PROCESS BATCH ***/
 static void process_batch(double *p_batch_in, int demod_type) {
-	
+
 	for (int i = 0; i < L; i++) {
 		/* COHERENT DEMODULATOR */
 		double val_in = (p_batch_in[i]);
@@ -138,16 +128,16 @@ static void process_batch(double *p_batch_in, int demod_type) {
 				if (a > left_max) {
 					left_max = a;
 				}
-				//if ((a*-1) > left_max) {
-				//	left_max = (a*-1);
-				//}
+				if ((a*-1) > left_max) {
+					left_max = (a*-1);
+				}
 				a = right[index1];
 				if (a > right_max) {
 					right_max = a;
 				}
-				//if ((a*-1) > right_max) {
-			//		right_max = (a*-1);
-		//		}
+				if ((a*-1) > right_max) {
+					right_max = (a*-1);
+				}
 				// Increment offset 1
 				if (++index1 >= SIZE_OUT) {
 					index1 = 0;
@@ -164,12 +154,10 @@ static void process_batch(double *p_batch_in, int demod_type) {
 		}
 
 	}
-
 }
 
 /***** MAIN *****/
 int main(int argc, char *argv[]) {
-	start = clock();
 
 	/* FILE PATHS */
 	const char *p_FILE_IN = argv[1];
@@ -259,8 +247,6 @@ int main(int argc, char *argv[]) {
 	/* NORMALISE */
 	double left_factor = 1/left_max;
 	double right_factor = 1/right_max;
-	printf("left_fact: %f\n", left_factor);
-	printf("r_fact: %f\n", right_factor);
 	FILE *fd_l_temp = fopen(temp_left, "rb");
 	FILE *fd_r_temp = fopen(temp_right, "rb");
 	FILE *fd_left = fopen(p_FILE_LEFT, "ab");
@@ -292,9 +278,5 @@ int main(int argc, char *argv[]) {
 	remove("l_temp.dat");
 	remove("r_temp.dat");
 
-	finish = clock();
-	t_total = (double)(finish-start) / CLOCKS_PER_SEC;
-	printf("Total: %f\n", t_total);
-	printf("\nFIN.\n");
 	return 0;
 }
