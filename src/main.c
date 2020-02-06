@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 		// Write
 		write_batch(p_FILE_LEFT, SIZE_OUT, left);
 		write_batch(p_FILE_RIGHT, SIZE_OUT, right);
-// 	}
+ 	}
 	fclose(fd_in);
 	
 	finish = clock();
