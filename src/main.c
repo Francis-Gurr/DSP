@@ -30,13 +30,6 @@ double diff[L];
 double left[SIZE_OUT];
 double right[SIZE_OUT];
 
-const char *p_FILE_SUM_RES1 = "res_s.dat";
-const char *p_FILE_DIFF_RES1 = "res_d.dat";
-const char *p_FILE_SUM_FIR1 = "fir1_s.dat";
-const char *p_FILE_DIFF_FIR1 = "fir1_d.dat";
-const char *p_FILE_SUM_FIR2 = "fir2_s.dat";
-const char *p_FILE_DIFF_FIR2 = "fir2_d.dat";
-
 /* FIR FILTER */
 //double buff_fir_sum[M-1] = {0};
 //double buff_fir_diff[M-1] = {0};
@@ -49,9 +42,9 @@ double buff_fir2_diff[M2] ={0};
 struct Filter f2 = {.SIZE_IN=L_2, .SIZE_FILTER=M2, .offset=0};
 
 /* DEMODULATOR */
-void (*demodulators[2])(float *, double *, double *, double *, int *) = {demod_costas, demod_coherent};
 double phi[2] = {0};
 int count = 0;
+int phase[2];
 //const char *p_FILE_SUM = "s.dat";
 //const char *p_FILE_DIFF = "d.dat";
 
@@ -65,7 +58,7 @@ void process_batch(float *p_batch_in, int demod_type) {
 	
 	/* DEMODULATE */
 	begin = clock();
-	(*demodulators[demod_type])(p_batch_in, sum, diff, phi, &count);
+	demod_coherent(p_batch_in, sum, diff, phi, phase);
 	end = clock();
 	t_demod[demod_type] += (double)(end-begin) / CLOCKS_PER_SEC;
 
@@ -126,7 +119,8 @@ int main(int argc, char *argv[]) {
 	/* FIRST BATCH */
 	begin = clock();
 	demod_costas(batch_in, sum, diff, phi, &count);
-	count = 0;
+	phase[0] = (count * 40) % 200;
+	phase[1] = (count * 42) % 200;
 	process_batch(batch_in, 1);
 	end = clock();
 	t_first_batch = (double)(end-begin) / CLOCKS_PER_SEC;

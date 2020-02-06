@@ -4,21 +4,31 @@
 #include<stdlib.h>
 #include<math.h>
 
-void demod_coherent(float *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_count){
+void demod_coherent(float *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_phase){
 	const double sum_phi = p_phi[0];
 	const double diff_phi = p_phi[1];
-	int count = *p_count;
+	int sum_phase = p_phase[0];
+	int diff_phase = p_phase[1];
 	for (int i = 0; i < L; i++) {
 
 		double val_in = (double)(p_in[i]);
 
 		// SUM
-		p_sum[i] = val_in * cos(SUM_FREQ*count + sum_phi);
+		//p_sum[i] = val_in * cos(SUM_FREQ*count + sum_phi);
+		p_sum[i] = val_in * OSC[sum_phase];
 		// DIFF 
-		p_diff[i] = val_in * cos(DIFF_FREQ*count + diff_phi);
-		count++;
+		//p_diff[i] = val_in * cos(DIFF_FREQ*count + diff_phi);
+		p_diff[i] = val_in * OSC[diff_phase];
+		if(sum_phase += 40 > 200) {
+			sum_phase -= 200;
+		}
+		if (diff_phase += 42 >= 200) {
+			diff_phase -= 200;
+		}
+
 	}
-	*p_count = count;
+	p_phase[0] = sum_phase;
+	p_phase[1] = diff_phase;
 }
 
 void demod_costas(float *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_count) {
