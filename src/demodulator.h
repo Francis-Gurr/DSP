@@ -12,6 +12,6 @@
 
 #endif
 
-void demod_coherent(float *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_count);
+void demod_coherent(float *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_phase);
 
 void demod_costas(float *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_count);

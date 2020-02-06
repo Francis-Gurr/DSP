@@ -14,13 +14,13 @@ void fir(double *p_sum, double *p_diff, double *p_buff_sum, double *p_buff_diff,
 		
 		double sum = 0;
 		double diff = 0;
-		#pragma omp parallel for shared(p_H_LOW, p_buff_sum, p_buff_diff, offset) reduction(+:sum,diff)
+//		#pragma omp parallel for shared(p_H_LOW, p_buff_sum, p_buff_diff, offset) reduction(+:sum,diff)
 		for (int j = offset; j >= 0; j--) {
 			sum += p_buff_sum[j] * p_H_LOW[offset-j];
 			diff += p_buff_diff[j] * p_H_LOW[offset-j];
 		}
 		int i_H =  offset + M;
-		#pragma omp parallel for shared(p_H_LOW, p_buff_sum, p_buff_diff, offset, i_H) reduction(+:sum,diff)
+//		#pragma omp parallel for shared(p_H_LOW, p_buff_sum, p_buff_diff, offset, i_H) reduction(+:sum,diff)
 		for (int j = M-1; j > offset; j--) {
 			sum += p_buff_sum[j] * p_H_LOW[i_H-j];
 			diff += p_buff_diff[j] * p_H_LOW[i_H-j];

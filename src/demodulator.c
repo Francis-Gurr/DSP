@@ -19,10 +19,10 @@ void demod_coherent(float *p_in, double *p_sum, double *p_diff, double *p_phi, i
 		// DIFF 
 		//p_diff[i] = val_in * cos(DIFF_FREQ*count + diff_phi);
 		p_diff[i] = val_in * OSC[diff_phase];
-		if(sum_phase += 40 > 200) {
+		if((sum_phase += 40) >= 200) {
 			sum_phase -= 200;
 		}
-		if (diff_phase += 42 >= 200) {
+		if ((diff_phase += 42) >= 200) {
 			diff_phase -= 200;
 		}
 
