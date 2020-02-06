@@ -4,7 +4,7 @@
 #include<stdlib.h>
 #include "h/init.h"
 
-void read_batch(FILE *fd, float *p_batch, int *p_exit) {
+void read_batch(FILE *fd, double *p_batch, int *p_exit) {
 	float batch_double[L2] = {0};
 	int sz = fread(batch_double, 4, L2, fd);
 	if (sz < L2) {
@@ -14,7 +14,7 @@ void read_batch(FILE *fd, float *p_batch, int *p_exit) {
 		}
 	}
 	for (int i = 0; i < L; i++) {
-		p_batch[i] = batch_double[i*2];
+		p_batch[i] = (double)batch_double[i*2];
 	}
 }
 

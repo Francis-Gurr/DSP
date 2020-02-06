@@ -31,7 +31,7 @@ void demod_coherent(float *p_in, double *p_sum, double *p_diff, double *p_phi, i
 	p_phase[1] = diff_phase;
 }
 
-void demod_costas(float *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_count) {
+void demod_costas(double *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_count) {
 
 	double phi_sum[L] = {0}, phi_diff[L] = {0};
 	double I_sum[L] = {0}, I_diff[L] = {0};
@@ -41,7 +41,7 @@ void demod_costas(float *p_in, double *p_sum, double *p_diff, double *p_phi, int
 	int count = *p_count;
 
 	for (int i = 0; i < L; i++) {
-		double in = (double)(p_in[i]);
+		double in = p_in[i];
 		if (i > 0) {
 			if (out_sum[i-1] * phase_sum[i-1] >= 0) {
 				phi_sum[i] = phi_sum[i-1] - (PHI_INC);

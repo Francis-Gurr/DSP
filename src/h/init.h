@@ -7,7 +7,7 @@
 #define M1 16
 #define M2 16
 #define M_RES 16
-#define SIZE_OUT 18
+#define SIZE_OUT 4096 
 
 const double H_LOW_1[M1];
 
