@@ -1,3 +1,10 @@
+/***************
+ * DSP Group 2
+ * Francis Gurr
+ * Lauren Miller
+ * Vicky Miles
+ * *************/
+
 #ifndef _STRUCTS
 #define _STRUCTS
 struct Filter {

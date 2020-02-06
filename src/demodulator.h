@@ -1,4 +1,11 @@
-#include "h/init.h"
+/***************
+ * DSP Group 2
+ * Francis Gurr
+ * Lauren Miller
+ * Vicky Miles
+ * *************/
+
+#include "init.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
@@ -12,6 +19,4 @@
 
 #endif
 
-void demod_coherent(float *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_phase);
-
-void demod_costas(float *p_in, double *p_sum, double *p_diff, double *p_phi, int *p_count);
+void demod_costas(double *p_in, double *p_sum, double *p_diff, double *p_phi);
