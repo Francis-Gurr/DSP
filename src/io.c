@@ -9,6 +9,9 @@ void read_batch(FILE *fd, float *p_batch, int *p_exit) {
 	int sz = fread(batch_double, 4, L2, fd);
 	if (sz < L2) {
 		*p_exit = 1;
+		for (int i = sz; i < L2; i++) {
+			batch_double[i] = 0;
+		}
 	}
 	for (int i = 0; i < L; i++) {
 		p_batch[i] = batch_double[i*2];
